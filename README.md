@@ -387,6 +387,13 @@ Output:<br>
    ![Bukti Connect Android Fisik](images/prak2_bukti2.jpg)
    ![Bukti Connect Android Fisik](images/prak2_bukti1.jpg)
 3. Pada praktikum 5 mulai dari Langkah 3 sampai 6, buatlah file widget tersendiri di folder `basic_widgets`, kemudian pada file `main.dart` cukup melakukan import widget sesuai masing-masing langkah tersebut! ✅
-4. Selesaikan Codelabs: Your first Flutter app, lalu buatlah laporan praktikumnya dan push ke repository GitHub Anda!
+4. Selesaikan Codelabs: Your first Flutter app, lalu buatlah laporan praktikumnya dan push ke repository GitHub Anda! ✅ <br>
+   Bukti:
+   ![Your first Flutter app](images/tuprak4.1.png)
+   ![Your first Flutter app](images/tuprak4.2.png)
+   ![Your first Flutter app](images/tuprak4.3.png)
+
+   ![Your first Flutter app](images/tuprak4.4.gif)
+
 5. `README.md` berisi: capture hasil akhir tiap praktikum (_side-by-side_, bisa juga berupa file GIF agar terlihat proses perubahan ketika ada aksi dari pengguna) dengan menampilkan NIM dan Nama Anda sebagai ciri pekerjaan Anda. ✅
 6. Kumpulkan berupa link repository/commit GitHub Anda kepada dosen yang telah disepakati! ✅
