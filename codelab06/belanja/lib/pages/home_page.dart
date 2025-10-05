@@ -1,5 +1,7 @@
 import 'package:belanja/models/item.dart';
 import 'package:flutter/material.dart';
+import 'package:belanja/widgets/product_card.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatelessWidget {
   final List<Item> items = [
@@ -9,6 +11,8 @@ class HomePage extends StatelessWidget {
       image: 'images/gula.jpg',
       stock: 20,
       rating: 4.9,
+      description:
+          'Gula pasir berkualitas tinggi, cocok untuk berbagai keperluan memasak dan membuat minuman manis. Memiliki tekstur halus dan mudah larut.',
     ),
     Item(
       name: 'Salt',
@@ -16,6 +20,8 @@ class HomePage extends StatelessWidget {
       image: 'images/garam.jpg',
       stock: 15,
       rating: 4.5,
+      description:
+          'Garam dapur murni yang dapat meningkatkan cita rasa masakan Anda. Ideal untuk semua jenis hidangan.',
     ),
     Item(
       name: 'Milk',
@@ -23,6 +29,8 @@ class HomePage extends StatelessWidget {
       image: 'images/susu.jpg',
       stock: 12,
       rating: 4.8,
+      description:
+          'Susu segar yang kaya akan kalsium dan nutrisi penting untuk kesehatan tulang. Cocok untuk diminum langsung atau sebagai bahan memasak.',
     ),
     Item(
       name: 'Flour',
@@ -30,6 +38,8 @@ class HomePage extends StatelessWidget {
       image: 'images/tepung.jpg',
       stock: 10,
       rating: 4.6,
+      description:
+          'Tepung terigu serbaguna yang ideal untuk membuat roti, kue, dan berbagai hidangan lainnya. Memiliki tekstur halus dan kualitas terbaik.',
     ),
     Item(
       name: 'Rice',
@@ -37,6 +47,8 @@ class HomePage extends StatelessWidget {
       image: 'images/beras.jpg',
       stock: 14,
       rating: 4.7,
+      description:
+          'Beras berkualitas tinggi dengan tekstur pulen, cocok untuk hidangan sehari-hari. Ditanam secara organik untuk hasil terbaik.',
     ),
     Item(
       name: 'Oil',
@@ -44,6 +56,8 @@ class HomePage extends StatelessWidget {
       image: 'images/minyak.jpg',
       stock: 18,
       rating: 4.8,
+      description:
+          'Minyak goreng berkualitas tinggi yang tahan panas dan cocok untuk berbagai jenis masakan. Memiliki rasa netral dan sehat.',
     ),
   ];
 
@@ -61,85 +75,24 @@ class HomePage extends StatelessWidget {
         ),
         itemCount: items.length,
         itemBuilder: (context, index) {
-          final item = items[index];
-          return InkWell(
+          return ProductCard(
+            item: items[index],
             onTap: () {
-              Navigator.pushNamed(context, '/item', arguments: item);
+              context.goNamed('item', extra: items[index]);
+              // Navigator.pushNamed(context, '/item', arguments: items[index]);
             },
-            child: Card(
-              elevation: 2.0,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Hero(
-                      tag: 'itemImage${item.name}',
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(4),
-                        ),
-                        child: Image.asset(
-                          item.image,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item.name,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Rp ${item.price}',
-                          style: const TextStyle(
-                            color: Colors.deepOrange,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Stok: ${item.stock}',
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.star,
-                                  color: Colors.amber,
-                                  size: 14,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  item.rating.toString(),
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
           );
         },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Padding(
+          padding: EdgeInsets.all(6),
+          child: Text(
+            'Dio Andika Pradana M. T. - 2341720098',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+        ),
       ),
     );
   }
