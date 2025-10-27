@@ -686,10 +686,12 @@ import 'package:flutter/rendering.dart' show ViewportOffset;
 # Tugas Praktikum
 
 1. Selesaikan Praktikum 1 dan 2, lalu dokumentasikan dan push ke repository Anda berupa screenshot setiap hasil pekerjaan beserta penjelasannya di file `README.md`! Jika terdapat error atau kode yang tidak dapat berjalan, silakan Anda perbaiki sesuai tujuan aplikasi dibuat! ꪜ
-2. Gabungkan hasil praktikum 1 dengan hasil praktikum 2 sehingga setelah melakukan pengambilan foto, dapat dibuat filter carouselnya! ꪜ
-   Bukti:
-   ![Praktikum 2](images/tuprak2.gif)
-   ![Praktikum 2](images/tuprak2.2.gif)
+2. Gabungkan hasil praktikum 1 dengan hasil praktikum 2 sehingga setelah melakukan pengambilan foto, dapat dibuat filter carouselnya! ꪜ <br>
+   Hasil Output:
+
+   ![Tugas Praktikum](images/tuprak2.gif)
+
+   ![Tugas Praktikum](images/tuprak2.2.gif)
 
 3. Jelaskan maksud `void async` pada praktikum 1? <br>
    Keyword `async` adalah singkatan dari asynchronous (asinkron). Keyword `async` pada fungsi main menandakan bahwa ada proses di dalam fungsi tersebut yang tidak bisa selesai secara instan dan aplikasi harus menunggu proses itu selesai sebelum melanjutkan ke langkah berikutnya. Fungsi yang ditandai `async` secara otomatis akan mengembalikan sebuah `Future`. Ini memberi tahu Dart bahwa fungsi tersebut mungkin akan melakukan pekerjaan yang memakan waktu (seperti mengakses kamera, query database, atau mengunduh file) dan tidak akan selesai secara instan. Pada praktikum 1, proses yang butuh waktu itu adalah fungsi `availableCameras()`, yang perlu berkomunikasi dengan sistem operasi perangkat (Android/iOS) untuk mendapatkan daftar kamera yang tersedia. Ini bukan proses instan, mungkin butuh beberapa milidetik. <br>
