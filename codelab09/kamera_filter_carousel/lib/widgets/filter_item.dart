@@ -1,0 +1,29 @@
+import 'package:flutter/material.dart';
+
+@immutable
+class FilterItem extends StatelessWidget {
+  const FilterItem({super.key, required this.color, this.onFilterSelected});
+
+  final Color color;
+  final VoidCallback? onFilterSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onFilterSelected,
+      child: AspectRatio(
+        aspectRatio: 1.0,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: ClipOval(
+            child: Image.network(
+              'https://fastly.picsum.photos/id/381/150/150.jpg?hmac=g8od_Yw0Vp8XuxFdKO1LF2fv7RZCLn3VJXvMqCOyako',
+              color: color.withOpacity(0.5),
+              colorBlendMode: BlendMode.hardLight,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
