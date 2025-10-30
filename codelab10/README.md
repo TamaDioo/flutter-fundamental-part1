@@ -243,45 +243,58 @@ Lakukan Hot restart (**bukan** hot reload) pada aplikasi Flutter Anda. Anda akan
 ## Tugas Praktikum 1: Dasar State dengan Model-View
 
 1. Selesaikan langkah-langkah praktikum tersebut, lalu dokumentasikan berupa GIF hasil akhir praktikum beserta penjelasannya di file `README.md`! Jika Anda menemukan ada yang error atau tidak berjalan dengan baik, silakan diperbaiki. ꪜ
-2. Jelaskan maksud dari langkah 4 pada praktikum tersebut! Mengapa dilakukan demikian? <br>
-   > Langkah ke-4 dalam praktikum ini bertujuan untuk menyederhanakan proses import dan merapikan struktur folder model. Pada file `plan_screen.dart`, hanya perlu menulis satu baris kode import untuk mendapatkan semua model yang dibutuhkan: `import '../models/data_layer.dart';`. Tanpa adanya file `data_layer.dart`, maka harus mengimpor setiap file model satu per satu.<br>
-   > Mengapa dilakukan demikian?
-   >
-   > - Praktis dan Ringkas: Proses import di file lain menjadi lebih ringkas, cukup satu baris. Dengan membuat satu file "gateway" seperti `data_layer.dart`, maka hanya perlu satu baris import di file lain (`plan_screen.dart`) untuk bisa mengakses semua class model (Plan dan Task).
-   > - Maintainable: Lebih mudah mengelola dependencies antar file. Ketika aplikasi berkembang dan memiliki puluhan file model, lalu ada file lain yang membutuhkan model-model tersebut, maka tidak perlu menulis puluhan baris `import`. Cukup impor `data_layer.dart` saja. Ini membuat kode lebih bersih dan mudah dikelola.
-   > - Struktur proyek menjadi lebih rapi dan terorganisir. Jadi, meskipun file `data_layer.dart` terlihat sangat sederhana karena hanya berisi export, perannya sangat penting untuk menjaga agar struktur proyek tetap rapi dan efisien seiring dengan perkembangannya.
-3. Mengapa perlu variabel plan di langkah 6 pada praktikum tersebut? Mengapa dibuat konstanta ? <br>
+2. Jelaskan maksud dari langkah 4 pada praktikum tersebut! Mengapa dilakukan demikian?
 
-   > Variabel `plan` digunakan sebagai state utama pada halaman `PlanScreen`. Variabel `plan` inilah yang menyimpan semua informasi yang akan ditampilkan di layar, yaitu daftar tugas (_list of tasks_). Setiap kali menambahkan tugas baru, menandai tugas sebagai selesai, atau mengedit deskripsi tugas, perubahan tersebut disimpan di dalam variabel `plan` ini. Karena data bisa berubah (misal, menambah task baru), `plan` harus menjadi variabel di dalam `State` supaya bisa di-update dan UI bisa di-refresh dengan `setState`. <br>
-   > Widget `\_buildList()` juga menggunakan `plan.tasks.length` untuk mengetahui berapa banyak item yang harus ditampilkan. Demikian pula, `\_buildTaskTile()` juga menggunakan data dari `plan.tasks` untuk menampilkan deskripsi dan status checkbox setiap tugas. <br>
-   > Ketika tombol `FloatingActionButton` ditekan atau ketika mengubah checkbox, kode di dalam `setState` dieksekusi. Di dalamnya, `plan` yang lama tidak diubah, melainkan membuat objek `Plan` yang baru dengan data yang sudah diperbarui, lalu menugaskannya kembali ke variabel `plan`. Pemanggilan `setState` ini memberi sinyal kepada Flutter sehingga perubahan tersebut bisa langsung terlihat oleh pengguna.<br>
-   > Jadi, tanpa variabel `plan`, layar `PlanScreen` tidak akan tahu data apa yang harus ditampilkan dan bagaimana merespons interaksi pengguna. <br>
-   > Mengapa dibuat konstanta ? <br>
-   > Untuk memberikan nilai awal. Setiap variabel harus punya nilai awal. `Plan()` adalah konstruktor untuk membuat objek `Plan`. Dengan menginisialisasinya seperti ini, dipastikan bahwa saat layar pertama kali dimuat, `plan` memiliki keadaan awal yang jelas, yaitu sebuah rencana kosong tanpa nama dan tanpa tugas sama sekali (`tasks = const []`). Hal ini dapat mencegah aplikasi dari error karena mencoba mengakses data yang belum ada.
+   Langkah ke-4 dalam praktikum ini bertujuan untuk menyederhanakan proses import dan merapikan struktur folder model. Pada file `plan_screen.dart`, hanya perlu menulis satu baris kode import untuk mendapatkan semua model yang dibutuhkan: `import '../models/data_layer.dart';`. Tanpa adanya file `data_layer.dart`, maka harus mengimpor setiap file model satu per satu.
+
+   Mengapa dilakukan demikian?
+
+   - Praktis dan Ringkas: Proses import di file lain menjadi lebih ringkas, cukup satu baris. Dengan membuat satu file "gateway" seperti `data_layer.dart`, maka hanya perlu satu baris import di file lain (`plan_screen.dart`) untuk bisa mengakses semua class model (Plan dan Task).
+   - Maintainable: Lebih mudah mengelola dependencies antar file. Ketika aplikasi berkembang dan memiliki puluhan file model, lalu ada file lain yang membutuhkan model-model tersebut, maka tidak perlu menulis puluhan baris `import`. Cukup impor `data_layer.dart` saja. Ini membuat kode lebih bersih dan mudah dikelola.
+   - Struktur proyek menjadi lebih rapi dan terorganisir. Jadi, meskipun file `data_layer.dart` terlihat sangat sederhana karena hanya berisi export, perannya sangat penting untuk menjaga agar struktur proyek tetap rapi dan efisien seiring dengan perkembangannya.
+
+3. Mengapa perlu variabel plan di langkah 6 pada praktikum tersebut? Mengapa dibuat konstanta ?
+
+   Variabel `plan` digunakan sebagai state utama pada halaman `PlanScreen`. Variabel `plan` inilah yang menyimpan semua informasi yang akan ditampilkan di layar, yaitu daftar tugas (_list of tasks_). Setiap kali menambahkan tugas baru, menandai tugas sebagai selesai, atau mengedit deskripsi tugas, perubahan tersebut disimpan di dalam variabel `plan` ini. Karena data bisa berubah (misal, menambah task baru), `plan` harus menjadi variabel di dalam `State` supaya bisa di-update dan UI bisa di-refresh dengan `setState`.
+
+   Widget `\_buildList()` juga menggunakan `plan.tasks.length` untuk mengetahui berapa banyak item yang harus ditampilkan. Demikian pula, `\_buildTaskTile()` juga menggunakan data dari `plan.tasks` untuk menampilkan deskripsi dan status checkbox setiap tugas.
+
+   Ketika tombol `FloatingActionButton` ditekan atau ketika mengubah checkbox, kode di dalam `setState` dieksekusi. Di dalamnya, `plan` yang lama tidak diubah, melainkan membuat objek `Plan` yang baru dengan data yang sudah diperbarui, lalu menugaskannya kembali ke variabel `plan`. Pemanggilan `setState` ini memberi sinyal kepada Flutter sehingga perubahan tersebut bisa langsung terlihat oleh pengguna.
+
+   Jadi, tanpa variabel `plan`, layar `PlanScreen` tidak akan tahu data apa yang harus ditampilkan dan bagaimana merespons interaksi pengguna.
+
+   Mengapa dibuat konstanta ? <br>
+   Untuk memberikan nilai awal. Setiap variabel harus punya nilai awal. `Plan()` adalah konstruktor untuk membuat objek `Plan`. Dengan menginisialisasinya seperti ini, dipastikan bahwa saat layar pertama kali dimuat, `plan` memiliki keadaan awal yang jelas, yaitu sebuah rencana kosong tanpa nama dan tanpa tugas sama sekali (`tasks = const []`). Hal ini dapat mencegah aplikasi dari error karena mencoba mengakses data yang belum ada.
 
 4. Lakukan capture hasil dari Langkah 9 berupa GIF, kemudian jelaskan apa yang telah Anda buat!
 
    ![Langkah 9](images/prak1_9.gif)
 
-   > Hasil dari langkah 9 adalah sebuah Aplikasi To_Do List yang memungkinkan pengguna untuk mengelola daftar tugas (tasks) dalam sebuah rencana (plan).
-   > Fungsionalitas Aplikasi: <br>
-   >
-   > - Menambah Tugas Baru: Dengan menekan tombol + (FloatingActionButton) di pojok kanan bawah, sebuah item tugas baru akan ditambahkan ke dalam daftar.
-   > - Mengedit Deskripsi Tugas: Untuk memberikan atau mengubah deskripsi tugas tersebut, bisa langsung mengetikkan di dalam kolom teks pada setiap item.
-   > - Menandai Tugas Selesai: Di sebelah kiri setiap tugas, terdapat checkbox yang dapat ditekan untuk menandai sebuah tugas sebagai selesai (atau membatalkannya).
+   Hasil dari langkah 9 adalah sebuah Aplikasi To_Do List yang memungkinkan pengguna untuk mengelola daftar tugas (tasks) dalam sebuah rencana (plan).
+
+   Fungsionalitas Aplikasi:
+
+   - Menambah Tugas Baru: Dengan menekan tombol + (FloatingActionButton) di pojok kanan bawah, sebuah item tugas baru akan ditambahkan ke dalam daftar.
+   - Mengedit Deskripsi Tugas: Untuk memberikan atau mengubah deskripsi tugas tersebut, bisa langsung mengetikkan di dalam kolom teks pada setiap item.
+   - Menandai Tugas Selesai: Di sebelah kiri setiap tugas, terdapat checkbox yang dapat ditekan untuk menandai sebuah tugas sebagai selesai (atau membatalkannya).
 
 5. Apa kegunaan method pada Langkah 11 dan 13 dalam _lifecyle state_ ?<br>
 
-   > Method `initState()` pada langkah 11 adalah langkah inisialisasi atau persiapan yang dijalankan satu kali ketika sebuah widget pertama kali dibuat dan dimasukkan ke dalam pohon widget (widget tree).
-   > Kegunaannya adalah:
-   >
-   > - Membuat `ScrollController`: Di sinilah objek `ScrollController` dibuat yang akan digunakan untuk mengontrol `ListView`.
-   > - Menambahkan `Listener`: `Listener` ditambahkan ke controller tersebut. `Listener` ini bertugas menjalankan kode `FocusScope.of(context).requestFocus(FocusNode())` setiap kali terjadi scroll. Kode ini secara efektif memerintahkan semua `TextFormField` untuk melepaskan fokusnya, yang mengakibatkan keyboard tertutup.
-   >   Persiapan ini hanya perlu dilakukan sekali seumur hidup widget sehingga `initState()` adalah tempat yang paling tepat untuk melakukannya.
-   >   Method `dispose()` pada langkah 13 adalah kebalikan dari `initState()`. Ini merupakan langkah pembersihan yang dijalankan ketika sebuah widget akan dihapus secara permanen dari widget tree.
-   >   Kegunaannya adalah:
-   > - Membersihkan Resource: `ScrollController` yang dibuat di `initState()` menggunakan memori. Jika tidak dibersihkan saat widget sudah tidak dipakai lagi, controller tersebut akan tetap ada di memori dan menyebabkan kebocoran memori (_memory leak_).
-   > - Mencegah Error: Dengan memanggil `scrollController.dispose()`, Flutter diberi tahu bahwa controller ini sudah tidak digunakan lagi dan sumber dayanya bisa dilepaskan. Ini merupakan praktik wajib untuk semua objek yang memiliki method `dispose()`.
-   >   Jadi, `initState()` berfungsi untuk mempersiapkan resource saat widget "lahir", dan `dispose()` berfungsi untuk membersihkan resource tersebut saat widget "mati", memastikan aplikasi berjalan efisien dan bebas dari _memory leak_.
+   Method `initState()` pada langkah 11 adalah langkah inisialisasi atau persiapan yang dijalankan satu kali ketika sebuah widget pertama kali dibuat dan dimasukkan ke dalam pohon widget (widget tree).
+
+   Kegunaannya adalah:
+
+   - Membuat `ScrollController`: Di sinilah objek `ScrollController` dibuat yang akan digunakan untuk mengontrol `ListView`.
+   - Menambahkan `Listener`: `Listener` ditambahkan ke controller tersebut. `Listener` ini bertugas menjalankan kode `FocusScope.of(context).requestFocus(FocusNode())` setiap kali terjadi scroll. Kode ini secara efektif memerintahkan semua `TextFormField` untuk melepaskan fokusnya, yang mengakibatkan keyboard tertutup.
+
+   Persiapan ini hanya perlu dilakukan sekali seumur hidup widget sehingga `initState()` adalah tempat yang paling tepat untuk melakukannya.
+
+   Method `dispose()` pada langkah 13 adalah kebalikan dari `initState()`. Ini merupakan langkah pembersihan yang dijalankan ketika sebuah widget akan dihapus secara permanen dari widget tree.
+   Kegunaannya adalah:
+
+   - Membersihkan Resource: `ScrollController` yang dibuat di `initState()` menggunakan memori. Jika tidak dibersihkan saat widget sudah tidak dipakai lagi, controller tersebut akan tetap ada di memori dan menyebabkan kebocoran memori (_memory leak_).
+   - Mencegah Error: Dengan memanggil `scrollController.dispose()`, Flutter diberi tahu bahwa controller ini sudah tidak digunakan lagi dan sumber dayanya bisa dilepaskan. Ini merupakan praktik wajib untuk semua objek yang memiliki method `dispose()`.
+
+   Jadi, `initState()` berfungsi untuk mempersiapkan resource saat widget "lahir", dan `dispose()` berfungsi untuk membersihkan resource tersebut saat widget "mati", memastikan aplikasi berjalan efisien dan bebas dari _memory leak_.
 
 6. Kumpulkan laporan praktikum Anda berupa link commit atau repository GitHub ke dosen yang telah disepakati ! ꪜ
