@@ -322,6 +322,29 @@ getNumber().then((value) {
 **Soal 6**
 
 - Jelaskan maksud perbedaan kode langkah 2 dengan langkah 5-6 tersebut!
-- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 6**".
+
+  Perbedaan utamanya adalah penanganan error (**error handling**) yang lengkap dan aman.
+
+  Kode pada Langkah 2 (`calculate`) adalah versi "optimis". Ia hanya menangani skenario sukses:
+
+  - Method `calculate()` didesain untuk selalu berhasil. Ia memanggil `completer.complete(42)` untuk menyelesaikan `Future` dengan sebuah nilai.
+  - `onPressed()` hanya menggunakan `.then()`. Kode ini "optimis" dan hanya menangani kasus sukses. Jika `calculate` gagal, aplikasi bisa crash karena tidak ada yang menangkap error.
+
+  Kode pada Langkah 5 dan 6 (`calculate2` dan `onPressed` baru) adalah versi yang jauh lebih aman (robust) karena menangani skenario sukses dan gagal:
+
+  - Langkah 5 (`calculate2`):
+
+    - Fungsi ini membungkus logika di dalam blok `try...catch`.
+    - Jika `await Future.delayed` (atau kode lain di dalam try) berhasil, ia akan memanggil `completer.complete(42)` (skenario sukses).
+    - Jika terjadi error apa pun, blok `catch` akan menangkapnya dan secara eksplisit memberi tahu `Future` bahwa telah terjadi kegagalan dengan memanggil `completer.completeError({})` (skenario gagal).
+
+  - Langkah 6 (`onPressed`):
+
+    - Karena sekarang ada kemungkinan `Future` selesai dengan error (dari `completer.completeError`), maka wajib menangkapnya di UI.
+    - Blok `.catchError((e) { ... })` ditambahkan untuk "mendengarkan" skenario gagal tersebut. Jika `Future` selesai dengan error, kode inilah yang akan dieksekusi, dan UI akan menampilkan "An error occurred" alih-alih crash atau hang.
+
+    Jadi singkatnya, Langkah 2 hanya menangani skenario sukses saja, sedangkan Langkah 5-6 secara lengkap menangani kesuksesan (`.then`) dan kegagalan (`.catchError`), membuat aplikasi menjadi lebih stabil.
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 6**". ꪜ
 
 ![Langkah 6](images/prak3_langkah6.gif)
