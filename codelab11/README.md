@@ -106,7 +106,7 @@ Tambahkan method ini ke dalam `class \_FuturePageState` yang berguna untuk menga
 >
 > - Carilah judul buku favorit Anda di Google Books, lalu ganti ID buku pada variabel `path` di kode tersebut. Caranya ambil di URL browser Anda seperti gambar berikut ini.
 >   ![Langkah 2](images/prak1_langkah4.1.png)
-> - Kemudian cobalah akses di browser URI tersebut dengan lengkap seperti ini. Jika menampilkan data JSON, maka Anda telah berhasil. Lakukan capture milik Anda dan tulis di `README` pada laporan praktikum. Lalu lakukan commit dengan pesan "**W11: Soal 2**".
+> - Kemudian cobalah akses di browser URI tersebut dengan lengkap seperti ini. Jika menampilkan data JSON, maka Anda telah berhasil. Lakukan capture milik Anda dan tulis di `README` pada laporan praktikum. Lalu lakukan commit dengan pesan "**W11: Soal 2**". ꪜ
 >   ![Langkah 2](images/prak1_langkah4.2.png)
 
 ### Langkah 5: Tambah kode di `ElevatedButton`
@@ -202,6 +202,7 @@ Lakukan comment kode sebelumnya, ubah isi kode onPressed() menjadi seperti berik
 Akhirnya, **run** atau tekan **F5** jika aplikasi belum running. Maka Anda akan melihat seperti gambar berikut, hasil angka 6 akan tampil setelah delay 9 detik.
 
 ![Langkah 4](images/prak2_langkah4.gif)
+
 ![Langkah 4](images/prak2_langkah4.png)
 
 **Soal 4**
@@ -224,3 +225,103 @@ Akhirnya, **run** atau tekan **F5** jika aplikasi belum running. Maka Anda akan 
   - `setState(() { ... })`: Setelah semua proses `await` selesai (total 9 detik), baris ini dieksekusi. `setState` memberi tahu Flutter untuk memperbarui layar dengan nilai `result` yang baru, yaitu "6".
 
 - Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 4**". ꪜ
+
+## Praktikum 3: Menggunakan Completer di Future
+
+### Langkah 1: Buka `main.dart`
+
+Pastikan telah impor package async berikut.
+
+```dart
+import 'package:async/async.dart';
+```
+
+### Langkah 2: Tambahkan variabel dan method
+
+Tambahkan variabel late dan method di `class _FuturePageState` seperti ini.
+
+```dart
+late Completer completer;
+
+Future getNumber() {
+  completer = Completer<int>();
+  calculate();
+  return completer.future;
+}
+
+Future calculate() async {
+  await Future.delayed(const Duration(seconds : 5));
+  completer.complete(42);
+}
+```
+
+### Langkah 3: Ganti isi kode `onPressed()`
+
+Tambahkan kode berikut pada fungsi `onPressed()`. Kode sebelumnya bisa Anda comment.
+
+```dart
+            ElevatedButton(
+              child: Text('Go!'),
+              onPressed: () {
+                getNumber().then((value) {
+                  setState(() {
+                    result = value.toString();
+                  });
+                });
+              },
+            ),
+```
+
+### Langkah 4:
+
+Terakhir, **run** atau tekan **F5** untuk melihat hasilnya jika memang belum running. Bisa juga lakukan **hot restart** jika aplikasi sudah running. Maka hasilnya akan seperti gambar berikut ini. Setelah 5 detik, maka angka 42 akan tampil.
+
+![Langkah 4](images/prak3_langkah4.gif)
+
+**Soal 5**
+
+- Jelaskan maksud kode langkah 2 tersebut!
+
+  Kode pada Langkah 2 ini memperkenalkan cara untuk mengontrol sebuah `Future` menggunakan `Completer`.
+
+  - `late Completer completer;`. Ini adalah deklarasi variabel untuk `Completer`. `Completer` adalah objek khusus dari paket `async` yang memungkinkan membuat `Future` dan menyelesaikannya (mengisi nilainya) kapan pun kita mau.
+  - `Future getNumber()`. Method ini bertugas membuat dan mengembalikan `Future` yang masih kosong (pending). Baris `completer = Completer<int>();` membuat "janji" baru bahwa akan ada data `int` di masa depan. Baris `calculate();` memulai fungsi `calculate` untuk berjalan di latar belakang. (**_Note: di sini tidak ada `await`, jadi `getNumber` tidak menunggu `calculate` selesai_**). `return completer.future;` adalah bagian kuncinya, method `getNumber` langsung mengembalikan objek `Future` yang masih kosong. Di Langkah 3, `onPressed` mengambil `Future` ini dan "mendengarkan" (`.then()`) kapan `Future` itu akan selesai.
+  - `Future calculate() async`, method ini bertugas melakukan pekerjaan dan menepati janji yang dibuat oleh `getNumber`. `await Future.delayed(...)` adalah simulasi pekerjaan yang butuh waktu lama (5 detik). Aplikasi tidak macet di sini. `completer.complete(42);` merupakan inti dari `Completer`. Setelah 5 detik menunggu, baris ini dieksekusi. `complete(42)` secara manual "menepati" janji yang `Future`-nya sedang didengarkan oleh `onPressed`. Ia berkata, "Pekerjaan selesai, ini nilainya: 42."
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 5**". ꪜ
+
+### Langkah 5: Ganti method `calculate()`
+
+Gantilah isi code method `calculate()` seperti kode berikut, atau Anda dapat membuat `calculate2()`
+
+```dart
+  Future calculate2() async {
+    try {
+      await Future.delayed(const Duration(seconds: 5));
+      completer.complete(42);
+    } catch (_) {
+      completer.completeError({});
+    }
+  }
+```
+
+### Langkah 6: Pindah ke `onPressed()`
+
+Ganti menjadi kode seperti berikut.
+
+```dart
+getNumber().then((value) {
+  setState(() {
+    result = value.toString();
+  });
+}).catchError((e) {
+  result = 'An error occurred';
+});
+```
+
+**Soal 6**
+
+- Jelaskan maksud perbedaan kode langkah 2 dengan langkah 5-6 tersebut!
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 6**".
+
+![Langkah 6](images/prak3_langkah6.gif)
