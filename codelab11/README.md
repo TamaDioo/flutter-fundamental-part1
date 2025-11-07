@@ -105,24 +105,45 @@ Tambahkan method ini ke dalam `class \_FuturePageState` yang berguna untuk menga
 > **Soal 2**
 >
 > - Carilah judul buku favorit Anda di Google Books, lalu ganti ID buku pada variabel `path` di kode tersebut. Caranya ambil di URL browser Anda seperti gambar berikut ini.
->   ![Langkah 1](images/prak1_langkah4.1.png)
+>   ![Langkah 2](images/prak1_langkah4.1.png)
 > - Kemudian cobalah akses di browser URI tersebut dengan lengkap seperti ini. Jika menampilkan data JSON, maka Anda telah berhasil. Lakukan capture milik Anda dan tulis di `README` pada laporan praktikum. Lalu lakukan commit dengan pesan "**W11: Soal 2**".
->   ![Langkah 1](images/prak1_langkah4.2.png)
+>   ![Langkah 2](images/prak1_langkah4.2.png)
 
 ### Langkah 5: Tambah kode di `ElevatedButton`
 
 Tambahkan kode pada `onPressed` di `ElevatedButton` seperti berikut.
 
 ```dart
-
+            ElevatedButton(
+              child: const Text('Go!'),
+              onPressed: () {
+                setState(() {});
+                getData()
+                    .then((value) {
+                      result = value.body.toString().substring(0, 450);
+                      setState(() {});
+                    })
+                    .catchError((_) {
+                      result = 'An error occured';
+                      setState(() {});
+                    });
+              },
+            ),
 ```
 
 Lakukan run aplikasi Flutter Anda. Anda akan melihat tampilan akhir seperti gambar berikut. Jika masih terdapat error, silakan diperbaiki hingga bisa running.
 
+![Langkah 5](images/prak1_langkah5.gif)
+
 **Soal 3**
 
 - Jelaskan maksud kode langkah 5 tersebut terkait `substring` dan `catchError`!
-- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 3**".
+
+  Kode `substring(0, 450)` akan memotong atau memangkas data teks yang diterima. Fungsi `getData()` mengambil data dari Google Books API. Data yang dikembalikan (`value.body`) seringkali berupa teks yang sangat panjang, bisa ribuan karakter. Jika semua teks itu ditampilkan di layar, tampilannya akan berantakan atau terjadi overflow. Oleh karena itu, kode `value.body.toString().substring(0, 450)` digunakan untuk mengambil hanya 450 karakter pertama saja (dimulai dari indeks 0 hingga sebelum 450) dari data tersebut. Sisa datanya diabaikan. Ini memastikan data yang ditampilkan di `Text(result)` pas di layar sebagai cuplikan.
+
+  Sedangkan `catchError` digunakan untuk menangani kegagalan (error handling). Fungsi `getData()` adalah operasi jaringan yang bergantung pada koneksi internet dan ketersediaan server Google. Operasi ini bisa gagal kapan saja (misalnya: HP tidak ada koneksi internet, server Google sedang down, atau URL salah). Jika `getData()` gagal, `Future` akan selesai dengan status error. Tanpa `catchError`, aplikasi akan crash. Jadi, blok `.catchError` berfungsi sebagai jaring pengaman. Jika terjadi error, kode di dalam `.then()` akan dilewati, dan kode di dalam `.catchError` akan dieksekusi.
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 3**". ꪜ
 
 ## Praktikum 2: Menggunakan await/async untuk menghindari callbacks
 
