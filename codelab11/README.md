@@ -348,3 +348,62 @@ getNumber().then((value) {
 - Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 6**". ꪜ
 
 ![Langkah 6](images/prak3_langkah6.gif)
+
+## Praktikum 4: Memanggil Future secara paralel
+
+### Langkah 1: Buka file `main.dart`
+
+Tambahkan method ini ke dalam `class _FuturePageState`
+
+```dart
+  void returnFG() {
+    FutureGroup<int> futureGroup = FutureGroup<int>();
+    futureGroup.add(returnOneAsync());
+    futureGroup.add(returnTwoAsync());
+    futureGroup.add(returnThreeAsync());
+    futureGroup.close();
+    futureGroup.future.then((List<int> value) {
+      int total = 0;
+      for (var element in value) {
+        total += element;
+      }
+      setState(() {
+        result = total.toString();
+      });
+    });
+  }
+```
+
+### Langkah 2: Edit `onPressed()`
+
+Anda bisa hapus atau comment kode sebelumnya, kemudian panggil method dari langkah 1 tersebut.
+
+```dart
+              onPressed: () {
+                returnFG();
+              },
+```
+
+### Langkah 3: Run
+
+Anda akan melihat hasilnya dalam 3 detik berupa angka 6 lebih cepat dibandingkan praktikum sebelumnya menunggu sampai 9 detik.
+
+![Langkah 3](images/prak4_langkah3.gif)
+
+**Soal 7**
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 7**". ꪜ
+
+### Langkah 4: Ganti variabel `futureGroup`
+
+Anda dapat menggunakan FutureGroup dengan `Future.wait` seperti kode berikut.
+
+```dart
+
+```
+
+**Soal 8**
+
+- Jelaskan maksud perbedaan kode langkah 1 dan 4!
+
+![Langkah 4](images/prak4_langkah4.gif)
