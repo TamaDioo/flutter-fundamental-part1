@@ -399,11 +399,33 @@ Anda akan melihat hasilnya dalam 3 detik berupa angka 6 lebih cepat dibandingkan
 Anda dapat menggunakan FutureGroup dengan `Future.wait` seperti kode berikut.
 
 ```dart
-
+final futures = Future.wait<int>([
+  returnOneAsync(),
+  returnTwoAsync(),
+  returnThreeAsync(),
+]);
 ```
 
 **Soal 8**
 
 - Jelaskan maksud perbedaan kode langkah 1 dan 4!
+
+  Maksud dari kedua potongan kode tersebut secara fungsional adalah sama persis. Keduanya menjalankan tiga method Future (`returnOneAsync`, `returnTwoAsync`, `returnThreeAsync`) secara paralel (bersamaan). Inilah mengapa hasilnya muncul dalam 3 detik, bukan 9 detik (seperti pada praktikum 2 yang menggunakan `await` secara berurutan).
+
+  Perbedaannya hanya terletak pada cara penulisan (sintaksis) dan asalnya:
+
+  - Langkah 1 (`FutureGroup`)
+
+    - Menggunakan class `FutureGroup` yang berasal dari package eksternal `package:async/async.dart`.
+    - Caranya lebih manual, yakni harus membuat objek `FutureGroup`, menambahkannya satu per satu (`.add()`), lalu "menutup" grup (`.close()`) untuk memberi tahu bahwa tidak ada lagi future yang akan ditambahkan.
+    - Sedikit lebih fleksibel jika perlu menambahkan future ke grup secara dinamis.
+
+  - Langkah 4 (`Future.wait`)
+
+    - Menggunakan metode statis `Future.wait` yang merupakan bawaan (built-in) dari Dart.
+    - Caranya jauh lebih ringkas dan umum digunakan.
+    - Hanya perlu memberikan satu `List` yang berisi semua future yang ingin ditunggu.
+
+  Intinya, langkah 4 (`Future.wait`) adalah cara standar yang lebih modern dan sederhana untuk mencapai apa yang dilakukan oleh langkah 1 (`FutureGroup`). Keduanya bertujuan untuk menjalankan beberapa tugas asynchronous secara bersamaan dan menunggu sampai semuanya selesai.
 
 ![Langkah 4](images/prak4_langkah4.gif)
