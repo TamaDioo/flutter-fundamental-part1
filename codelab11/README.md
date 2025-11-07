@@ -115,7 +115,7 @@ Tambahkan kode pada `onPressed` di `ElevatedButton` seperti berikut.
 
 ```dart
             ElevatedButton(
-              child: const Text('Go!'),
+              child: Text('Go!'),
               onPressed: () {
                 setState(() {});
                 getData()
@@ -133,8 +133,6 @@ Tambahkan kode pada `onPressed` di `ElevatedButton` seperti berikut.
 
 Lakukan run aplikasi Flutter Anda. Anda akan melihat tampilan akhir seperti gambar berikut. Jika masih terdapat error, silakan diperbaiki hingga bisa running.
 
-![Langkah 5](images/prak1_langkah5.gif)
-
 **Soal 3**
 
 - Jelaskan maksud kode langkah 5 tersebut terkait `substring` dan `catchError`!
@@ -144,6 +142,8 @@ Lakukan run aplikasi Flutter Anda. Anda akan melihat tampilan akhir seperti gamb
   Sedangkan `catchError` digunakan untuk menangani kegagalan (error handling). Fungsi `getData()` adalah operasi jaringan yang bergantung pada koneksi internet dan ketersediaan server Google. Operasi ini bisa gagal kapan saja (misalnya: HP tidak ada koneksi internet, server Google sedang down, atau URL salah). Jika `getData()` gagal, `Future` akan selesai dengan status error. Tanpa `catchError`, aplikasi akan crash. Jadi, blok `.catchError` berfungsi sebagai jaring pengaman. Jika terjadi error, kode di dalam `.then()` akan dilewati, dan kode di dalam `.catchError` akan dieksekusi.
 
 - Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 3**". ꪜ
+
+![Langkah 5](images/prak1_langkah5.gif)
 
 ## Praktikum 2: Menggunakan await/async untuk menghindari callbacks
 
@@ -173,7 +173,15 @@ Future<int> returnThreeAsync() async {
 Lalu tambahkan lagi method ini di bawah ketiga method sebelumnya.
 
 ```dart
-
+  Future count() async {
+    int total = 0;
+    total = await returnOneAsync();
+    total += await returnTwoAsync();
+    total += await returnThreeAsync();
+    setState(() {
+      result = total.toString();
+    });
+  }
 ```
 
 ### Langkah 3: Panggil `count()`
@@ -181,16 +189,38 @@ Lalu tambahkan lagi method ini di bawah ketiga method sebelumnya.
 Lakukan comment kode sebelumnya, ubah isi kode onPressed() menjadi seperti berikut.
 
 ```dart
-
+            ElevatedButton(
+              child: Text('Go!'),
+              onPressed: () {
+                count();
+              },
+            ),
 ```
 
 ### Langkah 4: Run
 
 Akhirnya, **run** atau tekan **F5** jika aplikasi belum running. Maka Anda akan melihat seperti gambar berikut, hasil angka 6 akan tampil setelah delay 9 detik.
 
-![Langkah 1](images/.png)
+![Langkah 4](images/prak2_langkah4.gif)
+![Langkah 4](images/prak2_langkah4.png)
 
 **Soal 4**
 
 - Jelaskan maksud kode langkah 1 dan 2 tersebut!
-- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 4**".
+
+  Langkah 1 menambahkan tiga method yaitu `returnOneAsync`, `returnTwoAsync`, dan `returnThreeAsync`.
+
+  - Keyword `async` menandakan bahwa method ini adalah fungsi asinkron. Artinya, fungsi ini bisa melakukan pekerjaan yang butuh waktu (seperti download data, tulis data ke database) tanpa membuat seluruh aplikasi macet.
+  - `Future<int>`: Ini adalah "janji" bahwa fungsi tersebut akan mengembalikan sebuah nilai int (angka) di masa depan (Future).
+  - `await Future.delayed(...)`. `Future.delayed` adalah perintah untuk "diam/tunggu" selama durasi yang ditentukan, dalam kasus ini 3 detik. Keyword `await` adalah perintah untuk menjeda eksekusi fungsi ini di baris tersebut sampai perintah "tunggu 3 detik" selesai. Ketka fungsi ini "dijeda" (`await`), aplikasi Flutter tidak ikut macet. UI tetap berjalan, dan loading spinner (`CircularProgressIndicator`) bisa terus berputar.
+  - `return 1;`: Setelah 3 detik selesai, jeda await berakhir, dan fungsi ini akhirnya mengembalikan nilai 1 (untuk `returnOneAsync`).
+
+  Langkah 2 menambahkan method `count` untuk mengelola ketiga method dari Langkah 1.
+
+  - `Future count() async` menandakan method ini juga merupakan fungsi asinkron.
+  - `total = await returnOneAsync();`. Baris ini menjalankan method `returnOneAsync()`. Lalu menunggu (`await`) sampai method itu selesai (yang memakan waktu 3 detik). Setelah selesai dan mengembalikan nilai 1, masukkan nilai itu ke `total`. Saat ini `total` bernilai 1.
+  - `total += await returnTwoAsync();`. Baris ini menjalankan method `returnTwoAsync()`. Lalu, menunggu lagi (`await`) sampai method itu selesai (3 detik lagi). Setelah selesai dan mengembalikan 2, tambahkan ke `total`. Saat ini `total` bernilai 1 + 2 = 3.
+  - `total += await returnThreeAsync();`. Sama seperti sebelumnya, menunggu 3 detik lagi untuk `returnThreeAsync`. Setelah selesai, tambahkan 3 ke `total`. `total` akhirnya bernilai 3 + 3 = 6.
+  - `setState(() { ... })`: Setelah semua proses `await` selesai (total 9 detik), baris ini dieksekusi. `setState` memberi tahu Flutter untuk memperbarui layar dengan nilai `result` yang baru, yaitu "6".
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 4**". ꪜ
