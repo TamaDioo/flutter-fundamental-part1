@@ -508,3 +508,138 @@ Tambahkan kode ini di dalam `class _FutureStatePage`
     - `try`: Ia mencoba menjalankan kode yang berisiko gagal (yaitu `await returnError()`).
     - `catch`: Jika blok `try` gagal dan melempar error, blok `catch` akan "menangkap" error tersebut. Di sinilah UI diberi tahu untuk menampilkan pesan error (`setState`) alih-alih membiarkan aplikasi crash.
     - `finally`: Blok ini akan selalu dieksekusi setelah `try` (jika sukses) atau `catch` (jika gagal) selesai, yang dalam kasus ini adalah mencetak "Complete" ke console.
+
+## Praktikum 6: Menggunakan Future dengan StatefulWidget
+
+### Langkah 1: install plugin geolocator
+
+Tambahkan plugin geolocator dengan mengetik perintah berikut di terminal.
+
+```dart
+flutter pub add geolocator
+```
+
+### Langkah 2: Tambah permission GPS
+
+Jika Anda menargetkan untuk platform **Android**, maka tambahkan baris kode berikut di file `android/app/src/main/androidmanifest.xml`
+
+```dart
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+```
+
+## Langkah 3: Buat file `geolocation.dart`
+
+Tambahkan file baru ini di folder lib project Anda.
+
+## Langkah 4: Buat StatefulWidget
+
+Buat `class LocationScreen` di dalam file `geolocation.dart`
+
+### Langkah 5: Isi kode `geolocation.dart`
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+
+class LocationScreen extends StatefulWidget {
+  const LocationScreen({super.key});
+
+  @override
+  State<LocationScreen> createState() => _LocationScreenState();
+}
+
+class _LocationScreenState extends State<LocationScreen> {
+  String myPosition = '';
+  @override
+  void initState() {
+    super.initState();
+    getPosition().then((Position myPos) {
+      myPosition =
+          'Latitude: ${myPos.latitude.toString()} - Longitude: ${myPos.longitude.toString()}';
+      setState(() {
+        myPosition = myPosition;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Current Location Dio')),
+      body: Center(child: Text(myPosition)),
+    );
+  }
+
+  Future<Position> getPosition() async {
+    await Geolocator.requestPermission();
+    await Geolocator.isLocationServiceEnabled();
+    Position? position = await Geolocator.getCurrentPosition();
+    return position;
+  }
+}
+```
+
+> **Soal 11**
+>
+> - Tambahkan **nama panggilan Anda** pada tiap properti `title` sebagai identitas pekerjaan Anda. ꪜ
+
+### Langkah 6: Edit `main.dart`
+
+Panggil screen baru tersebut di file main Anda seperti berikut.
+
+```dart
+home: LocationScreen(),
+```
+
+### Langkah 7: Run
+
+Run project Anda di **device** atau **emulator** (**bukan browser**), maka akan tampil seperti berikut ini.
+
+![Langkah 7](images/prak6_langkah7.png)
+
+#### Langkah 8: Tambahkan animasi loading
+
+Tambahkan widget loading seperti kode berikut. Lalu hot restart, perhatikan perubahannya.
+
+```dart
+  @override
+  Widget build(BuildContext context) {
+    final myWidget = myPosition == ''
+        ? const CircularProgressIndicator()
+        : Text(myPosition);
+    ;
+    return Scaffold(
+      appBar: AppBar(title: Text('Current Location Dio')),
+      body: Center(child: myWidget),
+    );
+  }
+```
+
+**Soal 12**
+
+- Jika Anda tidak melihat animasi loading tampil, kemungkinan itu berjalan sangat cepat. Tambahkan delay pada method `getPosition()` dengan kode `await Future.delayed(const Duration(seconds: 3));`
+  ```dart
+  Future<Position> getPosition() async {
+    await Geolocator.requestPermission();
+    await Geolocator.isLocationServiceEnabled();
+    await Future.delayed(const Duration(seconds: 3));
+    Position? position = await Geolocator.getCurrentPosition();
+    return position;
+  }
+  ```
+- Apakah Anda mendapatkan koordinat GPS ketika run di browser? Mengapa demikian?
+
+  ![Langkah 8](images/prak6_langkah8.png)
+
+  Ya, saya mendapatkan koordinat GPS ketika run di browser, meskipun browser tersebut tidak menggunakan chip GPS (karena laptop/PC biasanya tidak memilikinya). Namun, browser menggunakan API Geolokasi Web bawaannya, yang menentukan lokasi dengan menebak berdasarkan data jaringan (Wi-Fi / Alamat IP).
+
+  Plugin `geolocator` yang digunakan memiliki implementasi khusus untuk platform web. Saat menjalankan aplikasi di browser, plugin ini secara otomatis beralih untuk menggunakan API Geolokasi bawaan browser tersebut, alih-alih mencoba mengakses perangkat keras GPS yang tidak ada.
+
+  Jadi, kesimpulannya tetap bisa mendapatkan data lokasi meskipun run di browser, tetapi sumbernya berbeda (kemungkinan besar dari Wi-Fi), bukan dari satelit GPS seperti di HP.
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 12**". ꪜ
+
+  ![Langkah 8](images/prak6_langkah8.gif)
+
+## Praktikum 7: Manajemen Future dengan FutureBuilder
