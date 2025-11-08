@@ -45,7 +45,19 @@ class _FuturePageState extends State<FuturePage> {
             ElevatedButton(
               child: Text('Go!'),
               onPressed: () {
-                returnFG();
+                returnError()
+                    .then((value) {
+                      setState(() {
+                        result = 'Success';
+                      });
+                    })
+                    .catchError((onError) {
+                      setState(() {
+                        result = onError.toString();
+                      });
+                    })
+                    .whenComplete(() => print('Complete'));
+                // returnFG();
               },
             ),
             // children: [
@@ -165,19 +177,24 @@ class _FuturePageState extends State<FuturePage> {
       });
     });
 
-    // FutureGroup<int> futureGroup = FutureGroup<int>();
-    // futureGroup.add(returnOneAsync());
-    // futureGroup.add(returnTwoAsync());
-    // futureGroup.add(returnThreeAsync());
-    // futureGroup.close();
-    // futureGroup.future.then((List<int> value) {
-    //   int total = 0;
-    //   for (var element in value) {
-    //     total += element;
-    //   }
-    //   setState(() {
-    //     result = total.toString();
-    //   });
-    // });
+    /* FutureGroup<int> futureGroup = FutureGroup<int>();
+    futureGroup.add(returnOneAsync());
+    futureGroup.add(returnTwoAsync());
+    futureGroup.add(returnThreeAsync());
+    futureGroup.close();
+    futureGroup.future.then((List<int> value) {
+      int total = 0;
+      for (var element in value) {
+        total += element;
+      }
+      setState(() {
+        result = total.toString();
+      });
+    }); */
+  }
+
+  Future returnError() async {
+    await Future.delayed(const Duration(seconds: 2));
+    throw Exception('Something terrrible happened!');
   }
 }

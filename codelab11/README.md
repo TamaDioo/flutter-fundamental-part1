@@ -429,3 +429,61 @@ final futures = Future.wait<int>([
   Intinya, langkah 4 (`Future.wait`) adalah cara standar yang lebih modern dan sederhana untuk mencapai apa yang dilakukan oleh langkah 1 (`FutureGroup`). Keduanya bertujuan untuk menjalankan beberapa tugas asynchronous secara bersamaan dan menunggu sampai semuanya selesai.
 
 ![Langkah 4](images/prak4_langkah4.gif)
+
+## Praktikum 5: Menangani Respon Error pada Async Code
+
+### Langkah 1: Buka file `main.dart`
+
+Tambahkan method ini ke dalam `class _FuturePageState`
+
+```dart
+  Future returnError() async {
+    await Future.delayed(const Duration(seconds: 2));
+    throw Exception('Something terrrible happened!');
+  }
+```
+
+### Langkah 2: ElevatedButton
+
+Ganti dengan kode berikut
+
+```dart
+                    .then((value) {
+                      setState(() {
+                        result = 'Success';
+                      });
+                    })
+                    .catchError((onError) {
+                      setState(() {
+                        result = onError.toString();
+                      });
+                    })
+                    .whenComplete(() => print('Complete'));
+```
+
+### Langkah 3: Run
+
+Lakukan run dan klik tombol **GO!** maka akan menghasilkan seperti gambar berikut.
+
+![Langkah 3](images/prak5_langkah3.gif)
+
+Pada bagian debug console akan melihat teks `Complete` seperti berikut.
+
+![Langkah 3](images/prak5_langkah3.png)
+
+**Soal 9**
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 9**". ꪜ
+
+### Langkah 4: Tambah method `handleError()`
+
+Tambahkan kode ini di dalam `class _FutureStatePage`
+
+```dart
+
+```
+
+**Soal 10**
+
+- Panggil method `handleError()` tersebut di `ElevatedButton`, lalu run. Apa hasilnya? Jelaskan perbedaan kode langkah 1 dan 4!
+  ![Langkah 4](images/prak5_langkah4.gif)
