@@ -480,10 +480,31 @@ Pada bagian debug console akan melihat teks `Complete` seperti berikut.
 Tambahkan kode ini di dalam `class _FutureStatePage`
 
 ```dart
-
+  Future handleError() async {
+    try {
+      await returnError();
+    } catch (error) {
+      setState(() {
+        result = error.toString();
+      });
+    } finally {
+      print('Complete');
+    }
+  }
 ```
 
 **Soal 10**
 
 - Panggil method `handleError()` tersebut di `ElevatedButton`, lalu run. Apa hasilnya? Jelaskan perbedaan kode langkah 1 dan 4!
+
   ![Langkah 4](images/prak5_langkah4.gif)
+
+  Hasilnya sama dengan langkah 1, ketika tombol "Go!" ditekan, aplikasi akan menunggu 2 detik, dan kemudian tampilan di layar akan berubah menunjukkan teks "Exception: Something terrrible happened!". Selain itu, di Debug Console juga akan tercetak teks "Complete".
+
+  Perbedaan antara kode di Langkah 1 dan Langkah 4 adalah perbedaan antara penyebab error dan penanganan error.
+
+  - Pada langkah 1, method `returnError()` adalah fungsi yang sengaja dirancang untuk gagal. Tugasnya hanya satu, yaitu menunggu 2 detik, lalu melemparkan (`throw`) sebuah `Exception`. Method ini tidak menangani error, ia menyebabkan error.
+  - Pada langkah 4, method `handleError()` adalah fungsi yang dirancang untuk menangani kegagalan tersebut dengan aman. Ia menggunakan sintaks `try...catch...finally`:
+    - `try`: Ia mencoba menjalankan kode yang berisiko gagal (yaitu `await returnError()`).
+    - `catch`: Jika blok `try` gagal dan melempar error, blok `catch` akan "menangkap" error tersebut. Di sinilah UI diberi tahu untuk menampilkan pesan error (`setState`) alih-alih membiarkan aplikasi crash.
+    - `finally`: Blok ini akan selalu dieksekusi setelah `try` (jika sukses) atau `catch` (jika gagal) selesai, yang dalam kasus ini adalah mencetak "Complete" ke console.
