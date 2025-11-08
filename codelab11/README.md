@@ -643,3 +643,110 @@ Tambahkan widget loading seperti kode berikut. Lalu hot restart, perhatikan peru
   ![Langkah 8](images/prak6_langkah8.gif)
 
 ## Praktikum 7: Manajemen Future dengan FutureBuilder
+
+### Langkah 1: Modifikasi method `getPosition()`
+
+Buka file `geolocation.dart` kemudian ganti isi method dengan kode ini.
+
+```dart
+  Future<Position> getPosition() async {
+    await Geolocator.isLocationServiceEnabled();
+    await Future.delayed(const Duration(seconds: 3));
+    Position? position = await Geolocator.getCurrentPosition();
+    return position;
+  }
+```
+
+### Langkah 2: Tambah variabel
+
+Tambah variabel ini di `class _LocationScreenState`
+
+```dart
+Future<Position>? position;
+```
+
+### Langkah 2: Tambah `initState()`
+
+Tambah method ini dan set variabel `position`
+
+```dart
+  @override
+  void initState() {
+    super.initState();
+    position = getPosition();
+  }
+```
+
+### Langkah 4: Edit method `build()`
+
+Ketik kode berikut dan sesuaikan. Kode lama bisa Anda comment atau hapus.
+
+```dart
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Current Location Dio')),
+      body: Center(
+        child: FutureBuilder(
+          future: position,
+          builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.connectionState == ConnectionState.done) {
+              return Text(snapshot.data.toString());
+            } else {
+              return const Text('');
+            }
+          },
+        ),
+      ),
+    );
+  }
+```
+
+**Soal 13**
+
+- Apakah ada perbedaan UI dengan praktikum sebelumnya? Mengapa demikian?
+
+  Secara fungsional dan visual, tidak ada perbedaan UI yang signifikan. Keduanya sama-sama menampilkan loading indicator (`CircularProgressIndicator`) selagi data GPS diambil, dan kemudian menampilkan hasil koordinat setelah datanya didapat.
+
+  Perbedaannya tidak terletak pada apa yang ditampilkan, tetapi pada bagaimana cara menampilkannya. Keduanya adalah dua cara berbeda untuk menyelesaikan masalah yang sama.
+
+  - Praktikum 6 (Cara Manual dengan `setState`).
+
+    - Status tampilan dikelola secara manual dengan membuat variabel `myPosition = ''`.
+    - Di dalam `build()`, secara manual memeriksa: "Apakah `myPosition` masih kosong? Jika ya, tampilkan loading. Jika tidak, tampilkan `Text`."
+    - Setelah `Future` selesai (di dalam `.then()`), `setState()` dipanggil untuk memberi tahu Flutter, "Hei, datanya sudah ada, tolong rebuild UI-nya."
+
+  - Praktikum 7 (Cara Otomatis dengan `FutureBuilder`)
+
+    - Menggunakan widget `FutureBuilder` yang memang dirancang khusus untuk menangani `Future`.
+    - Hanya perlu memberikan `Future` yang ingin "didengarkan" (yaitu `position`).
+    - `FutureBuilder` secara otomatis mengelola statusnya sendiri. Ia akan secara otomatis rebuild ketika `Future` berubah status.
+    - Di dalam `builder`, tidak perlu memeriksa variabel, hanya perlu memeriksa `snapshot.connectionState`. Jika `ConnectionState.waiting`, `FutureBuilder` tahu datanya belum siap sehingga menampilkan loading. Jika `ConnectionState.done`, `FutureBuilder` tahu datanya sudah ada sehingga menampilkan `Text` berisi data (`snapshot.data`).
+
+    Singkatnya, `FutureBuilder` adalah cara yang lebih clean, modern, dan deklaratif untuk melakukan persis dengan apa yang dilakukan secara manual di praktikum sebelumnya.
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 13**". ꪜ
+
+  ![Soal 13](images/prak7_soal13.gif)
+
+- Seperti yang Anda lihat, menggunakan FutureBuilder lebih efisien, clean, dan reactive dengan Future bersama UI.
+
+### Langkah 5: Tambah handling error
+
+Tambahkan kode berikut untuk menangani ketika terjadi error. Kemudian hot restart.
+
+```dart
+else if (snapshot.connectionState == ConnectionState.done) {
+  if (snapshot.hasError) {
+     return Text('Something terrible happened!');
+  }
+  return Text(snapshot.data.toString());
+}
+```
+
+**Soal 14**
+
+- Apakah ada perbedaan UI dengan langkah sebelumnya? Mengapa demikian?
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 14**". ꪜ
