@@ -725,7 +725,7 @@ Ketik kode berikut dan sesuaikan. Kode lama bisa Anda comment atau hapus.
     - `FutureBuilder` secara otomatis mengelola statusnya sendiri. Ia akan secara otomatis rebuild ketika `Future` berubah status.
     - Di dalam `builder`, tidak perlu memeriksa variabel, hanya perlu memeriksa `snapshot.connectionState`. Jika `ConnectionState.waiting`, `FutureBuilder` tahu datanya belum siap sehingga menampilkan loading. Jika `ConnectionState.done`, `FutureBuilder` tahu datanya sudah ada sehingga menampilkan `Text` berisi data (`snapshot.data`).
 
-    Singkatnya, `FutureBuilder` adalah cara yang lebih clean, modern, dan deklaratif untuk melakukan persis dengan apa yang dilakukan secara manual di praktikum sebelumnya.
+  Singkatnya, `FutureBuilder` adalah cara yang lebih clean, modern, dan deklaratif untuk melakukan persis dengan apa yang dilakukan secara manual di praktikum sebelumnya.
 
 - Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 13**". ꪜ
 
@@ -749,4 +749,14 @@ else if (snapshot.connectionState == ConnectionState.done) {
 **Soal 14**
 
 - Apakah ada perbedaan UI dengan langkah sebelumnya? Mengapa demikian?
+
+  Ya, ada perbedaan UI yang sangat penting, tetapi perbedaan itu hanya muncul ketika terjadi error.
+
+  - Sebelumnya (langkah 4) jika `Future` (`getPosition`) gagal (misalnya, pengguna menolak izin lokasi), `snapshot` akan berada dalam status error. Kode sebelumnya tidak memeriksa ini. Ia langsung mencoba menjalankan `return Text(snapshot.data.toString())` (karena `connectionState` sudah done). Karena ada error, `snapshot.data` menjadi null sehingga akan tampil teks "null" pada layar.
+  - Sekarang (langkah 5) telah ditambahkan handling error yaitu `if (snapshot.hasError)`. Artinya jika `Future` berhasil, UI akan sama persis seperti sebelumnya, menampilkan data koordinat. Namun, jika `Future` gagal, `FutureBuilder` akan menangkap error tersebut dan menampilkan teks "Something terrible happened!" pada layar.
+
 - Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 14**". ꪜ
+
+  ![Soal 14](images/prak7_soal14_error.gif)
+
+  ![Soal 14](images/prak7_soal14.gif)
