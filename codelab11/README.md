@@ -760,3 +760,191 @@ else if (snapshot.connectionState == ConnectionState.done) {
   ![Soal 14](images/prak7_soal14_error.gif)
 
   ![Soal 14](images/prak7_soal14.gif)
+
+## Praktikum 8: Navigation route dengan Future Function
+
+### Langkah 1: Buat file baru `navigation_first.dart`
+
+Buatlah file baru ini di project lib Anda.
+
+### Langkah 2: Isi kode `navigation_first.dart`
+
+```dart
+import 'package:books/view/navigation_second.dart';
+import 'package:flutter/material.dart';
+
+class NavigationFirst extends StatefulWidget {
+  const NavigationFirst({super.key});
+
+  @override
+  State<NavigationFirst> createState() => _NavigationFirstState();
+}
+
+class _NavigationFirstState extends State<NavigationFirst> {
+  Color color = Colors.indigoAccent.shade700;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: color,
+      appBar: AppBar(title: const Text('Navigation First Screen Dio')),
+      body: Center(
+        child: ElevatedButton(
+          child: const Text('Change color'),
+          onPressed: () {
+            _navigateAndGetColor(context);
+          },
+        ),
+      ),
+    );
+  }
+
+  Future _navigateAndGetColor(BuildContext context) async {
+    color =
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const NavigationSecond()),
+        ) ??
+        Colors.indigoAccent;
+    setState(() {});
+  }
+}
+```
+
+**Soal 15**
+
+- Tambahkan **nama panggilan Anda** pada tiap properti `title` sebagai identitas pekerjaan Anda. ꪜ
+- Silakan ganti dengan warna tema favorit Anda. ꪜ
+
+### Langkah 3: Tambah method di class `_NavigationFirstState`
+
+Tambahkan method ini.
+
+```dart
+  Future _navigateAndGetColor(BuildContext context) async {
+    color = await Navigator.push(context, MaterialPageRoute(builder: (context) => const NavigationSecond()),) ?? Colors.blue;
+    setState(() {});
+  }
+```
+
+### Langkah 4: Buat file baru `navigation_second.dart`
+
+Buat file baru ini di project lib Anda. Silakan jika ingin mengelompokkan view menjadi satu folder dan sesuaikan impor yang dibutuhkan.
+
+### Langkah 5: Buat class NavigationSecond dengan StatefulWidget
+
+```dart
+import 'package:flutter/material.dart';
+
+class NavigationSecond extends StatefulWidget {
+  const NavigationSecond({super.key});
+
+  @override
+  State<NavigationSecond> createState() => _NavigationSecondState();
+}
+
+class _NavigationSecondState extends State<NavigationSecond> {
+  @override
+  Widget build(BuildContext context) {
+    Color color;
+    return Scaffold(
+      appBar: AppBar(title: const Text('Navigation Second Screen Dio')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              child: const Text('Red'),
+              onPressed: () {
+                color = Colors.red.shade700;
+                Navigator.pop(context, color);
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Green'),
+              onPressed: () {
+                color = Colors.green.shade700;
+                Navigator.pop(context, color);
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Pink'),
+              onPressed: () {
+                color = Colors.pink.shade700;
+                Navigator.pop(context, color);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Langkah 6: Edit `main.dart`
+
+Lakukan edit properti home.
+
+```dart
+home: const NavigationFirst(),
+```
+
+### Langkah 8: Run
+
+Lakukan run, jika terjadi error silakan diperbaiki.
+
+**Soal 16**
+
+- Cobalah klik setiap button, apa yang terjadi ? Mengapa demikian ?
+
+  Apa yang Terjadi?
+
+  - Ketika menekan tombol "Change color", aplikasi berpindah dari `NavigationFirstScreen` yang latar belakangnya berwarna biru (`IndigoAccent`) ke `NavigationSecondScreen`.
+  - Kemudian saat menekan salah satu tombol warna (misalnya, "Orange"), `NavigationSecondScreen` tertutup, dan kembali ke `NavigationFirstScreen`. Seketika, warna latar belakang `NavigationFirstScreen` berubah menjadi warna yang dipilih (misalnya, oranye).
+
+  Mengapa Demikian?
+
+  Ini adalah contoh bagaimana `Navigator` di Flutter dapat mengembalikan data saat kembali dari sebuah layar. `Navigator.push` pada dasarnya adalah sebuah `Future`. Cara kerjanya adalah:
+
+  1. `await Navigator.push`: Di `NavigationFirstScreen`, saat menekan tombol, method `_navigateAndGetColor` dipanggil. Baris `await Navigator.push(...)` memerintahkan aplikasi untuk membuka `NavigationSecondScreen` dan menjeda eksekusi method ini (seperti `Future`) dan menunggu sampai `NavigationSecondScreen` ditutup dan mengirimkan kembali sebuah nilai.
+
+  2. `Navigator.pop`: Di N`avigationSecondScreen`, saat menekan tombol, misalnya "Orange", maka Warna yang sesuai diatur (`color = Colors.orange.shade700;`) dan `Navigator.pop(context, color)` dipanggil. Perintah ini menutup layar kedua dan mengirimkan nilai color (warna oranye) sebagai hasil dari `Future` yang sedang ditunggu.
+
+  3. `setState`: Eksekusi di `NavigationFirstScree` dilanjutkan. `Future` selesai dan nilai kembaliannya (warna oranye) diterima dan disimpan ke dalam variabel `color` di `_NavigationFirstState`.
+
+     - `setState(() {})` kemudian dipanggil.
+     - Panggilan `setState` ini memberi tahu Flutter untuk membangun ulang (rebuild) `NavigationFirstScreen` dengan nilai `color` yang baru, yang kemudian digunakan sebagai `backgroundColor Scaffold`.
+
+  Singkatnya, layar kedua digunakan untuk "memilih" sebuah nilai, mengirim nilai itu kembali ke layar pertama, dan memperbarui tampilan layar pertama berdasarkan nilai tersebut.
+
+- Gantilah 3 warna pada langkah 5 dengan warna favorit Anda! ꪜ
+  ```dart
+            children: [
+            ElevatedButton(
+              child: const Text('Orange'),
+              onPressed: () {
+                color = Colors.orange.shade700;
+                Navigator.pop(context, color);
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Purple'),
+              onPressed: () {
+                color = Colors.purple.shade700;
+                Navigator.pop(context, color);
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Blue'),
+              onPressed: () {
+                color = Colors.blue.shade700;
+                Navigator.pop(context, color);
+              },
+            ),
+          ],
+  ```
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 16**". ꪜ
+
+Hasilnya akan seperti GIF berikut ini.
+
+![Soal 16](images/prak8_soal16.gif)
