@@ -948,3 +948,153 @@ Lakukan run, jika terjadi error silakan diperbaiki.
 Hasilnya akan seperti GIF berikut ini.
 
 ![Soal 16](images/prak8_soal16.gif)
+
+## Praktikum 9: Memanfaatkan async/await dengan Widget Dialog
+
+### Langkah 1: Buat file baru `navigation_dialog.dart`
+
+Buat file dart baru di folder lib project Anda.
+
+### Langkah 2: Isi kode `navigation_dialog.dart`
+
+```dart
+import 'package:flutter/material.dart';
+
+class NavigationDialogScreen extends StatefulWidget {
+  const NavigationDialogScreen({super.key});
+
+  @override
+  State<NavigationDialogScreen> createState() => _NavigationDialogScreenState();
+}
+
+class _NavigationDialogScreenState extends State<NavigationDialogScreen> {
+  Color color = Colors.blue.shade700;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: color,
+      appBar: AppBar(title: const Text('Navigation Dialog Screen')),
+      body: Center(
+        child: ElevatedButton(
+          child: const Text('Change Color'),
+          onPressed: () {},
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Langkah 3: Tambah method async
+
+```dart
+  Future _showColorDialog(BuildContext context) async {
+    await showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text('Very important question'),
+          content: const Text('Please choose a color'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Orange'),
+              onPressed: () {
+                color = Colors.orange.shade700;
+                Navigator.pop(context, color);
+              },
+            ),
+            TextButton(
+              child: const Text('Purple'),
+              onPressed: () {
+                color = Colors.purple.shade700;
+                Navigator.pop(context, color);
+              },
+            ),
+            TextButton(
+              child: const Text('Pink'),
+              onPressed: () {
+                color = Colors.pink.shade700;
+                Navigator.pop(context, color);
+              },
+            ),
+          ],
+        );
+      },
+    );
+    setState(() {});
+  }
+```
+
+### Langkah 4: Panggil method di `ElevatedButton`
+
+```dart
+          onPressed: () {
+            _showColorDialog(context);
+          },
+```
+
+### Langkah 5: Edit `main.dart`
+
+Ubah properti home
+
+```dart
+      home: const NavigationDialogScreen(),
+```
+
+### Langkah 6: Run
+
+Coba ganti warna background dengan widget dialog tersebut. Jika terjadi error, silakan diperbaiki. Jika berhasil, akan tampil seperti gambar berikut.
+
+![Langkah 6](images/prak9_langkah6.png)
+
+**Soal 17**
+
+- Cobalah klik setiap button, apa yang terjadi ? Mengapa demikian ?
+
+  Apa yang Terjadi?
+
+  Ketika menekan tombol "Change Color", sebuah dialog box (pop-up) muncul di tengah layar. Ketika memilih salah satu tombol warna di dalam dialog tersebut (misalnya "Orange"), dialog akan tertutup, dan warna latar belakang seluruh layar akan berubah menjadi warna yang dipilih.
+
+  Mengapa Demikian?
+
+  Ini adalah alur `async/await` yang digunakan untuk menangani return value dari sebuah dialog. `showDialog` pada dasarnya adalah sebuah `Future`, sama seperti `Navigator.push`.
+
+  1. Menunggu (`await showDialog`): Saat tombol "Change Color" ditekan, method `showColorDialog` dipanggil. Baris await `showDialog(...)` memerintahkan method untuk "berhenti sejenak" dan menunggu sampai dialog ditutup (dengan menekan tombol warna).
+
+  2. Mengubah State dan Menutup (`Navigator.pop`): Di dalam `AlertDialog`, ketika menekan tombol, misalnya "Orange", dua hal terjadi secara berurutan:
+
+     - State Diubah: Variabel `color` di `NavigationDialogScreenState` langsung diperbarui nilainya (`color = Colors.orange.shade700;`).
+     - Dialog Ditutup: `Navigator.pop(context, color)` dipanggil. Ini menutup dialog dan "membangunkan" await yang sedang berhenti sejenak.
+
+  3. Rebuild (`setState`): Setelah `await` selesai (karena dialog sudah ditutup), eksekusi kode dilanjutkan ke baris berikutnya, yaitu `setState(() {});`. Panggilan `setState` ini memberi tahu Flutter bahwa State telah berubah dan meminta Flutter agar membangun ulang (rebuild) UI-nya. Saat Flutter membangun ulang UI, `Scaffold` akan membaca nilai baru dari variabel `color` (yang kini telah menjadi orange), sehingga warna latar belakang pun berubah.
+
+- Gantilah 3 warna pada langkah 3 dengan warna favorit Anda! ꪜ
+  ```dart
+            actions: <Widget>[
+            TextButton(
+              child: const Text('Orange'),
+              onPressed: () {
+                color = Colors.orange.shade700;
+                Navigator.pop(context, color);
+              },
+            ),
+            TextButton(
+              child: const Text('Purple'),
+              onPressed: () {
+                color = Colors.purple.shade700;
+                Navigator.pop(context, color);
+              },
+            ),
+            TextButton(
+              child: const Text('Pink'),
+              onPressed: () {
+                color = Colors.pink.shade700;
+                Navigator.pop(context, color);
+              },
+            ),
+          ],
+  ```
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. Lalu lakukan commit dengan pesan "**W11: Soal 17**". ꪜ
+
+  ![Soal 17](images/prak9_soal17.gif)
