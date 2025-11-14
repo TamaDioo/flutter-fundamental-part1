@@ -221,18 +221,28 @@ Lakukan running pada aplikasi Flutter Anda, maka akan terlihat berubah warna bac
 - Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
 - Lakukan commit hasil jawaban Soal 4 dengan pesan "**W12: Jawaban Soal 4**" ꪜ
 
-### Langkah 13: Ganti isi method `changeColor()`
-
-Anda boleh comment atau hapus kode sebelumnya, lalu ketika kode seperti berikut.
+Mengganti isi method `changeColor()`:
 
 ```dart
-
+  void changeColor() async {
+    colorStream.getColors().listen((eventColor) {
+      setState(() {
+        bgColor = eventColor;
+      });
+    });
+  }
 ```
 
 **Soal 5**
 
 - Jelaskan perbedaan menggunakan `listen` dan `await for` (langkah 9) !
-- Lakukan commit hasil jawaban Soal 5 dengan pesan "**W12: Jawaban Soal 5**"
+
+  Perbedaan utamanya terletak pada cara eksekusi kodenya (**blocking vs non-blocking**).
+
+  - `.listen()` adalah metode non-blocking. Method "berlangganan" ke Stream dan method akan langsung selesai, tapi akan mendapat "panggilan" setiap kali ada data baru. Analoginya seperti berlangganan notifikasi email. Hanya mendaftar sekali (`.listen`), lalu bebas melanjutkan pekerjaan lain. Setiap kali ada data baru (email masuk), maka akan "diberi tahu" (kode `callback` dipanggil).
+  - `await for` adalah loop yang blocking (di dalam fungsi `async`). Method akan "berhenti sejenak" di loop tersebut, menunggu setiap data baru, mengeksekusi loop, lalu menunggu lagi. Jadi, method `changeColor()` akan berhenti (pause) di loop itu dan tidak akan pindah ke baris berikutnya.
+
+- Lakukan commit hasil jawaban Soal 5 dengan pesan "**W12: Jawaban Soal 5**" ꪜ
 
 ## Praktikum 2: Stream controllers dan sinks
 
