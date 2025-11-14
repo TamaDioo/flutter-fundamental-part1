@@ -246,99 +246,188 @@ Mengganti isi method `changeColor()`:
 
 ## Praktikum 2: Stream controllers dan sinks
 
-### Langkah 1: Buka file `stream.dart`
-
-Lakukan impor dengan mengetik kode ini.
+### Update kode `stream.dart`
 
 ```dart
+import 'package:flutter/material.dart';
 import 'dart:async';
-```
 
-### Langkah 2: Tambah class `NumberStream`
+class ColorStream {
+  final List<Color> colors = [
+    Colors.blueGrey,
+    Colors.amber,
+    Colors.deepPurple,
+    Colors.lightBlue,
+    Colors.teal,
+    Colors.yellow,
+    Colors.pink,
+    Colors.lime,
+    Colors.cyan,
+    Colors.orange,
+  ];
 
-Tetap di file `stream.dart` tambah class baru seperti berikut.
+  Stream<Color> getColors() async* {
+    yield* Stream.periodic(const Duration(seconds: 1), (int t) {
+      int index = t % colors.length;
+      return colors[index];
+    });
+  }
+}
 
-```dart
+// Langkah 2, 3, 4, & 5 Praktikum 2
+class NumberStream {
+  final StreamController<int> controller = StreamController<int>();
 
-```
+  void addNumberToSink(int newNumber) {
+    controller.sink.add(newNumber);
+  }
 
-### Langkah 3: Tambah `StreamController`
-
-Di dalam `class NumberStream` buatlah variabel seperti berikut.
-
-```dart
-
-```
-
-### Langkah 4: Tambah method `addNumberToSink`
-
-Tetap di `class NumberStream` buatlah method ini
-
-```dart
-
-```
-
-### Langkah 5: Tambah method `close()`
-
-```dart
-
-```
-
-### Langkah 6: Buka `main.dart`
-
-Ketik kode import seperti berikut
-
-```dart
-
-```
-
-### Langkah 7: Tambah variabel
-
-Di dalam `class _StreamHomePageState` ketik variabel berikut
-
-```dart
-
-```
-
-### Langkah 8: Edit `initState()`
-
-```dart
-
-```
-
-### Langkah 9: Edit `dispose()`
-
-```dart
-
-```
-
-### Langkah 10: Tambah method `addRandomNumber()`
-
-```dart
-void addRandomNumber() {
-  Random random = Random();
-  int myNum = random.nextInt(10);
-  numberStream.addNumberToSink(myNum);
+  close() {
+    controller.close();
+  }
 }
 ```
 
-### Langkah 11: Edit method `build()`
+### Update kode `main.dart`
 
 ```dart
+import 'package:flutter/material.dart';
+import 'stream.dart';
+import 'dart:async';
+import 'dart:math';
 
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Stream Dio',
+      theme: ThemeData(primarySwatch: Colors.indigo),
+      home: const StreamHomePage(),
+    );
+  }
+}
+
+class StreamHomePage extends StatefulWidget {
+  const StreamHomePage({super.key});
+
+  @override
+  State<StreamHomePage> createState() => _StreamHomePageState();
+}
+
+class _StreamHomePageState extends State<StreamHomePage> {
+  Color bgColor = Colors.blueGrey;
+  late ColorStream colorStream;
+  // Langkah 7 Praktikum 2
+  int lastNumber = 0;
+  late StreamController numberStreamController;
+  late NumberStream numberStream;
+
+  @override
+  void initState() {
+    // Langkah 8 Praktikum 2
+    numberStream = NumberStream();
+    numberStreamController = numberStream.controller;
+    Stream stream = numberStreamController.stream;
+    stream.listen((event) {
+      setState(() {
+        lastNumber = event;
+      });
+    });
+    super.initState();
+    // colorStream = ColorStream();
+    // changeColor();
+  }
+
+  // Langkah 9 Praktikum 2
+  @override
+  void dispose() {
+    numberStreamController.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Stream Dio')),
+      // Langkah 11 Praktikum 2
+      body: SizedBox(
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(lastNumber.toString()),
+            ElevatedButton(
+              onPressed: () => addRandomNumber(),
+              child: Text('New Random Number'),
+            ),
+          ],
+        ),
+      ),
+      // body: Container(decoration: BoxDecoration(color: bgColor)),
+    );
+  }
+
+  void changeColor() async {
+    colorStream.getColors().listen((eventColor) {
+      setState(() {
+        bgColor = eventColor;
+      });
+    });
+
+    /* Langkah 9
+    await for (var eventColor in colorStream.getColors()) {
+      setState(() {
+        bgColor = eventColor;
+      });
+    } */
+  }
+
+  // Langkah 10 Praktikum 2
+  void addRandomNumber() {
+    Random random = Random();
+    int myNum = random.nextInt(100);
+    numberStream.addNumberToSink(myNum);
+  }
+}
 ```
 
-### Langkah 12: Run
+### Run
 
 Lakukan running pada aplikasi Flutter Anda, maka akan terlihat seperti gambar berikut.
 
-![Langkah 12](images/prak1_langkah12.png)
+![Langkah 12](images/prak2_langkah12.png)
 
 **Soal 6**
 
 - Jelaskan maksud kode langkah 8 dan 10 tersebut!
-- Capture hasil praktikum Anda berupa GIF dan lampirkan di README.
-- Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 6**".
+
+  Secara singkat, langkah 8 adalah kode untuk **"mendengarkan"** data, dan langkah 10 adalah kode untuk **"mengirim"** data. Keduanya bekerja bersama untuk membuat _stream_ berfungsi.
+
+  - Langkah 8: `initState()`
+    Maksud dari kode di `initState()` adalah untuk **menyiapkan dan berlangganan (subscribe) ke _stream_** saat halaman tersebut pertama kali dibuka. Ini adalah langkah "persiapan".
+    1. `numberStream = NumberStream();`: Membuat objek `NumberStream`.
+    2. `numberStreamController = numberStream.controller;`: Ini mengambil "otak" dari _stream_, yaitu `StreamController`.
+    3. `Stream stream = numberStreamController.stream;`: Ini mengambil "ujung pipa" _stream_ yang bisa didengarkan oleh publik.
+    4. `stream.listen((event) { ... });`: Ini adalah bagian terpenting. Kode ini "mendaftar" atau _subscribe_ ke _stream_. Kapanpun ada data baru (`event`) yang masuk, maka akan menjalankan kode di dalam kurung kurawal ini.
+    5. `setState(() { lastNumber = event; });`: Setiap kali data baru (angka) diterima, ia memanggil `setState` untuk memperbarui variabel `lastNumber` dan memberi tahu Flutter untuk rebuild layar dengan angka yang baru.
+  - Langkah 10: `addRandomNumber()`
+    Maksud dari kode `addRandomNumber()` adalah untuk **menghasilkan data baru dan memasukkannya ke dalam _stream_**.
+    1. `Random random = Random();`: Membuat generator angka acak.
+    2. `int myNum = random.nextInt(100);`: Menghasilkan angka acak baru antara 0 dan 99.
+    3. `numberStream.addNumberToSink(myNum);`: Merupakan aksi kunci. Kode ini mengambil angka acak (`myNum`) dan "menuangkannya" ke dalam _stream_ (melalui `sink`).
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
+
+  ![Langkah 12](images/prak2_langkah12.gif)
+
+- Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 6**". ꪜ
 
 ### Langkah 13: Buka `stream.dart`
 
@@ -367,7 +456,7 @@ Lakukan _comment_ pada dua baris kode berikut, lalu ketik kode seperti berikut i
 **Soal 7**
 
 - Jelaskan maksud kode langkah 13 sampai 15 tersebut!
-- Kembalikan kode seperti semula pada Langkah 15, comment `addError()` agar Anda dapat melanjutkan ke praktikum 3 berikutnya.
-- Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 7**".
+- Kembalikan kode seperti semula pada Langkah 15, comment `addError()` agar Anda dapat melanjutkan ke praktikum 3 berikutnya. ꪜ
+- Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 7**". ꪜ
 
 ## Praktikum 3: Injeksi data ke streams
