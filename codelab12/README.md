@@ -70,7 +70,7 @@ class _StreamHomePageState extends State<StreamHomePage> {
 
 - Lakukan commit hasil jawaban Soal 1 dengan pesan "**W12: Jawaban Soal 1**" ꪜ
 
-Kode program stream.dart:
+Kode program `stream.dart`:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -105,73 +105,59 @@ class ColorStream {
   ```
 - Lakukan commit hasil jawaban Soal 2 dengan pesan "**W12: Jawaban Soal 2**" ꪜ
 
-### Langkah 5: Tambahkan method `getColors()`
-
-Di dalam `class ColorStream` ketik method seperti kode berikut. Perhatikan tanda bintang di akhir keyword `async*` (ini digunakan untuk melakukan `Stream` data)
+Menambahkan method `getColors()` dan perintah `yield*` pada `stream.dart`:
 
 ```dart
-
-```
-
-### Langkah 6: Tambah perintah `yield*`
-
-Tambahkan kode berikut ini.
-
-```dart
-yield* Stream.periodic(
-  const Duration(seconds: 1), (int t) {
-    int index = t % colors.length;
-    return colors[index];
-});
+  Stream<Color> getColors() async* {
+    yield* Stream.periodic(const Duration(seconds: 1), (int t) {
+      int index = t % colors.length;
+      return colors[index];
+    });
+  }
 ```
 
 **Soal 3**
 
 - Jelaskan fungsi keyword `yield*` pada kode tersebut!
+
+  Keyword `yield*` berfungsi untuk meneruskan (mendelegasikan) semua nilai dari _Stream_ lain ke dalam _Stream_ saat ini.
+
+  - `yield` (tanpa \*): Digunakan untuk mengirim satu nilai ke dalam _Stream_.
+  - `yield*` (dengan \*): Digunakan untuk mengambil seluruh _Stream_ lain dan membiarkan semua nilainya mengalir ke dalam _Stream_ saat ini, satu per satu.
+
+  Pada kode tersebut, `yield* Stream.periodic(...)` dapat diartikan: "Ambil Stream yang dibuat oleh `Stream.periodic`, dan setiap kali Stream itu menghasilkan nilai, teruskan nilai tersebut seolah-olah itu adalah nilai dari Stream `getColors`."
+
 - Apa maksud isi perintah kode tersebut?
-- Lakukan commit hasil jawaban Soal 3 dengan pesan "**W12: Jawaban Soal 3**"
 
-### Langkah 7: Buka `main.dart`
+  Singkatnya, kode tersebut bertujuan untuk membuat sebuah generator warna yang tidak pernah berhenti.
+  Fungsi `getColors()` adalah sebuah Stream yang akan mengeluarkan satu warna baru setiap satu detik, secara berulang-ulang dari daftar yang ada.
 
-Ketik kode impor file ini pada file `main.dart`
+  1. Class `ColorStream` memiliki sebuah List berisi 10 warna (`final List<Color> colors`).
+  2. `Stream.periodic(const Duration(seconds: 1), ...)` adalah sebuah Stream bawaan Dart yang akan menghasilkan sebuah angka (`int `) setiap 1 detik. Angka ini akan terus bertambah (0, 1, 2, 3, ...).
+  3. Kode `int index = t % colors.length;` menggunakan operasi modulo. `colors.length` adalah 10, jadi:
 
-```dart
-import 'stream.dart';
-```
+     - Ketika t = 0, index = 0 % 10 = 0
+     - Ketika t = 1, index = 1 % 10 = 1
+     - ...
+     - Ketika t = 9, index = 9 % 10 = 9
+     - Ketika t = 10, index = 10 % 10 = 0 (kembali ke awal)
+     - Ketika t = 11, index = 11 % 10 = 1
+     - Dan seterusnya...
 
-### Langkah 8: Tambah variabel
+  4. `return colors[index];` mengambil warna dari List berdasarkan index yang berulang tersebut.
+  5. `yield\*` memastikan bahwa warna yang dipilih di langkah 4 dikeluarkan oleh Stream `getColors` setiap detiknya.
 
-Ketik dua properti ini di dalam `class _StreamHomePageState`
+  Hasil akhirnya adalah sebuah Stream yang akan menampilkan: Colors.blueGrey (detik 1), Colors.amber (detik 2), ... Colors.orange (detik 10), lalu Colors.blueGrey (detik 11), dan seterusnya.
 
-```dart
+- Lakukan commit hasil jawaban Soal 3 dengan pesan "**W12: Jawaban Soal 3**" ꪜ
 
-```
-
-### Langkah 9: Tambah method `changeColor()`
-
-Tetap di file main, Ketik kode seperti berikut
-
-```dart
-
-```
-
-### Langkah 10: Lakukan override `initState()`
-
-Ketikkan kode seperti berikut.
+Update kode `main.dart`:
 
 ```dart
 
 ```
 
-### Langkah 11: Ubah isi `scaffold()`
-
-Sesuaikan kode seperti berikut.
-
-```dart
-
-```
-
-### Langkah 12: Run
+### Run
 
 Lakukan running pada aplikasi Flutter Anda, maka akan terlihat berubah warna background setiap detik.
 
@@ -180,7 +166,7 @@ Lakukan running pada aplikasi Flutter Anda, maka akan terlihat berubah warna bac
 **Soal 4**
 
 - Capture hasil praktikum Anda berupa GIF dan lampirkan di README.
-- Lakukan commit hasil jawaban Soal 4 dengan pesan "**W12: Jawaban Soal 4**"
+- Lakukan commit hasil jawaban Soal 4 dengan pesan "**W12: Jawaban Soal 4**" ꪜ
 
 ### Langkah 13: Ganti isi method `changeColor()`
 
@@ -194,8 +180,6 @@ Anda boleh comment atau hapus kode sebelumnya, lalu ketika kode seperti berikut.
 
 - Jelaskan perbedaan menggunakan `listen` dan `await for` (langkah 9) !
 - Lakukan commit hasil jawaban Soal 5 dengan pesan "**W12: Jawaban Soal 5**"
-
-> Catatan: Stream di Flutter memiliki fitur yang powerfull untuk menangani data secara async. Stream dapat dimanfaatkan pada skenario dunia nyata seperti real-time messaging, unggah dan unduh file, tracking lokasi user, bekerja dengan data sensor IoT, dan lain sebagainya.
 
 ## Praktikum 2: Stream controllers dan sinks
 
