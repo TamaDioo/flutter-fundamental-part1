@@ -154,18 +154,71 @@ Menambahkan method `getColors()` dan perintah `yield*` pada `stream.dart`:
 Update kode `main.dart`:
 
 ```dart
+import 'package:flutter/material.dart';
+import 'stream.dart';
 
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Stream Dio',
+      theme: ThemeData(primarySwatch: Colors.indigo),
+      home: const StreamHomePage(),
+    );
+  }
+}
+
+class StreamHomePage extends StatefulWidget {
+  const StreamHomePage({super.key});
+
+  @override
+  State<StreamHomePage> createState() => _StreamHomePageState();
+}
+
+class _StreamHomePageState extends State<StreamHomePage> {
+  Color bgColor = Colors.blueGrey;
+  late ColorStream colorStream;
+
+  @override
+  void initState() {
+    super.initState();
+    colorStream = ColorStream();
+    changeColor();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Stream Dio')),
+      body: Container(decoration: BoxDecoration(color: bgColor)),
+    );
+  }
+
+  void changeColor() async {
+    await for (var eventColor in colorStream.getColors()) {
+      setState(() {
+        bgColor = eventColor;
+      });
+    }
+  }
+}
 ```
 
 ### Run
 
 Lakukan running pada aplikasi Flutter Anda, maka akan terlihat berubah warna background setiap detik.
 
-![Langkah 12](images/prak1_langkah12.png)
+![Langkah 12](images/prak1_langkah12.gif)
 
 **Soal 4**
 
-- Capture hasil praktikum Anda berupa GIF dan lampirkan di README.
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
 - Lakukan commit hasil jawaban Soal 4 dengan pesan "**W12: Jawaban Soal 4**" ꪜ
 
 ### Langkah 13: Ganti isi method `changeColor()`
