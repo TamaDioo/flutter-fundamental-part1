@@ -6,7 +6,7 @@ KELAS : TI-3F
 
 ## Praktikum 1: Dart Streams
 
-Kode Program `main.dart`:
+### Kode Program `main.dart`:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -70,7 +70,7 @@ class _StreamHomePageState extends State<StreamHomePage> {
 
 - Lakukan commit hasil jawaban Soal 1 dengan pesan "**W12: Jawaban Soal 1**" ꪜ
 
-Kode program `stream.dart`:
+### Kode program `stream.dart`:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -105,7 +105,7 @@ class ColorStream {
   ```
 - Lakukan commit hasil jawaban Soal 2 dengan pesan "**W12: Jawaban Soal 2**" ꪜ
 
-Menambahkan method `getColors()` dan perintah `yield*` pada `stream.dart`:
+#### Menambahkan method `getColors()` dan perintah `yield*` pada `stream.dart`:
 
 ```dart
   Stream<Color> getColors() async* {
@@ -151,7 +151,7 @@ Menambahkan method `getColors()` dan perintah `yield*` pada `stream.dart`:
 
 - Lakukan commit hasil jawaban Soal 3 dengan pesan "**W12: Jawaban Soal 3**" ꪜ
 
-Update kode `main.dart`:
+### Update kode `main.dart`:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -221,7 +221,7 @@ Lakukan running pada aplikasi Flutter Anda, maka akan terlihat berubah warna bac
 - Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
 - Lakukan commit hasil jawaban Soal 4 dengan pesan "**W12: Jawaban Soal 4**" ꪜ
 
-Mengganti isi method `changeColor()`:
+#### Mengganti isi method `changeColor()`:
 
 ```dart
   void changeColor() async {
@@ -429,34 +429,66 @@ Lakukan running pada aplikasi Flutter Anda, maka akan terlihat seperti gambar be
 
 - Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 6**". ꪜ
 
-### Langkah 13: Buka `stream.dart`
-
-Tambahkan method berikut ini.
+#### Menambahkan addError() pada `stream.dart`:
 
 ```dart
-
+  addError() {
+    controller.sink.addError("error");
+  }
 ```
 
-### Langkah 14: Buka `main.dart`
-
-Tambahkan method `onError` di dalam class `StreamHomePageState` pada method `listen` di fungsi `initState()` seperti berikut ini.
+#### Menambahkan method `onError` di dalam class `StreamHomePageState` pada method `listen` di fungsi `initState()`:
 
 ```dart
-
+    stream
+        .listen((event) {
+          setState(() {
+            lastNumber = event;
+          });
+        })
+        .onError((error) {
+          setState(() {
+            lastNumber = -1;
+          });
+        });
 ```
 
-### Langkah 15: Edit method `addRandomNumber()`
-
-Lakukan _comment_ pada dua baris kode berikut, lalu ketik kode seperti berikut ini.
+#### Mengedit method `addRandomNumber()`:
 
 ```dart
-
+  void addRandomNumber() {
+    Random random = Random();
+    // int myNum = random.nextInt(100);
+    // numberStream.addNumberToSink(myNum);
+    numberStream.addError();
+  }
 ```
 
 **Soal 7**
 
 - Jelaskan maksud kode langkah 13 sampai 15 tersebut!
+
+  Maksud dari langkah 13, 14, dan 15 adalah untuk **mendemonstrasikan dan menguji cara kerja penanganan error (error handling) di dalam sebuah Stream.**
+
+  - Langkah 13: `addError()`
+    **Maksud:** Membuat fungsi untuk **mengirimkan sinyal error**. Tugas _method_ ini hanya satu: **sengaja mengirimkan sebuah objek error** ke dalam _stream_ melalui `sink`.
+  - Langkah 14: `.onError()`
+    **Maksud:** Menyiapkan "penangkap" atau **pendengar untuk sinyal error**. Dengan menambahkan `.onError((error) { ... })` pada kode `stream.liste`n di `initState`, maka _stream_ tahu apa yang harus dilakukan jika ia menerima _sinyal error_ alih-alih data. Dalam kasus ini, ia diperintahkan untuk memperbarui layar (`setState`) dan menampilkan angka `-1`.
+  - Langkah 15: Mengubah `addRandomNumber()`
+    **Maksud:** Mengubah tombol agar **memicu error** dengan menggantinya dengan `numberStream.addError()`, alih-alih mengirim data.
+    Ketiga langkah ini bekerja bersama-sama. Sekarang, ketika tombol "New Random Number" ditekan (Langkah 15), akan memicu pengiriman sinyal error (Langkah 13). Sinyal error ini mengalir melalui _stream_ dan "ditangkap" oleh listener `.onError` (Langkah 14), yang kemudian menyebabkan layar menampilkan angka `-1`.
+
 - Kembalikan kode seperti semula pada Langkah 15, comment `addError()` agar Anda dapat melanjutkan ke praktikum 3 berikutnya. ꪜ
+
+  ```dart
+  void addRandomNumber() {
+    Random random = Random();
+    int myNum = random.nextInt(100);
+    numberStream.addNumberToSink(myNum);
+    // numberStream.addError();
+  }
+  ```
+
 - Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 7**". ꪜ
 
 ## Praktikum 3: Injeksi data ke streams

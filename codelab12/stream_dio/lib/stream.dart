@@ -34,4 +34,9 @@ class NumberStream {
   close() {
     controller.close();
   }
+
+  // Langkah 13 Praktikum 2
+  addError() {
+    controller.sink.addError("error");
+  }
 }
