@@ -492,3 +492,82 @@ Lakukan running pada aplikasi Flutter Anda, maka akan terlihat seperti gambar be
 - Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 7**". ꪜ
 
 ## Praktikum 3: Injeksi data ke streams
+
+### Update class `_StreamHomePageState` `main.dart`:
+
+```dart
+class _StreamHomePageState extends State<StreamHomePage> {
+  Color bgColor = Colors.blueGrey;
+  late ColorStream colorStream;
+  // Langkah 7 Praktikum 2
+  int lastNumber = 0;
+  late StreamController numberStreamController;
+  late NumberStream numberStream;
+  // Langkah 1 Praktikum 3
+  late StreamTransformer transformer;
+
+  @override
+  void initState() {
+    // Langkah 8 Praktikum 2
+    numberStream = NumberStream();
+    numberStreamController = numberStream.controller;
+    Stream stream = numberStreamController.stream;
+    // Langkah 2 Praktikum 3
+    transformer = StreamTransformer<int, int>.fromHandlers(
+      handleData: (value, sink) {
+        sink.add(value * 10);
+      },
+      handleError: (error, trace, sink) {
+        sink.add(-1);
+      },
+      handleDone: (sink) => sink.close(),
+    );
+        // Langkah 3 Praktikum 3
+    stream
+        .transform(transformer)
+        .listen((event) {
+          setState(() {
+            lastNumber = event;
+          });
+        })
+        .onError((error) {
+          setState(() {
+            lastNumber = -1;
+          });
+        });
+    super.initState();
+    // colorStream = ColorStream();
+    // changeColor();
+  }
+
+  // Existing code
+}
+```
+
+### Run
+
+**Run** atau tekan **F5** untuk melihat hasilnya jika memang belum running. Bisa juga lakukan **hot restart** jika aplikasi sudah running. Maka hasilnya akan seperti gambar berikut ini.
+
+![Langkah 4](images/prak3_langkah4.png)
+
+**Soal 8**
+
+- Jelaskan maksud kode langkah 1-3 tersebut!
+
+  Maksud dari kode langkah 1-3 adalah untuk **membuat, mendefinisikan, dan menerapkan sebuah `StreamTransformer`** ke _stream_. Secara sederhana, `StreamTransformer` adalah "filter" atau "konverter" yang dipasang di tengah "pipa" _stream_. Ia akan mencegat setiap data (atau error) yang lewat, mengubahnya sesuai aturan, lalu mengirimkan data yang sudah diubah itu ke pendengar (_listener_).
+
+  1. Langkah 1 (`late StreamTransformer transformer;`) adalah **deklarasi variabel** dan akan diberi nilainya nanti sebelum digunakan (makanya menggunakan `late`).
+  2. Langkah 2 (`transformer = StreamTransformer.fromHandlers(...)`) merupakan **logic** dari _transformer_.
+
+  - **`handleData: (value, sink) { sink.add(value * 10); }`** adalah aturan utama. Dikatakan: "Setiap kali ada data angka (`value`) yang masuk, **kalikan dengan 10**, lalu kirimkan (`sink.add`) hasil perkalian itu ke pipa keluaran.". _Contoh:_ Angka `25` masuk -> diubah jadi `250` -> `250` dikirim keluar.
+  - **`handleError: (error, trace, sink) { sink.add(-1); }`** merupakan error handling. Dikatakan: "Jika ada _error_ yang masuk ke pipa, jangan teruskan errornya. Sebaliknya, tangkap error itu dan kirimkan angka `-1` sebagai gantinya."
+
+  3. Langkah 3: `stream.transform(transformer).listen(...)` merupakan **penerapan** filter tersebut ke pipa _stream_.
+
+  Hasil akhirnya adalah `setState` (yang menampilkan angka di layar) tidak lagi menerima angka acak asli (misal `25`), tetapi menerima **angka yang sudah di-transformasi** (yaitu `250`).
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
+
+  ![Langkah 4](images/prak3_langkah4.gif)
+
+- Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 8**". ꪜ
