@@ -37,8 +37,32 @@ class _StreamHomePageState extends State<StreamHomePage> {
   // Langkah 1 Praktikum 3
   late StreamTransformer transformer;
 
+  // Langkah 1 Praktikum 4
+  late StreamSubscription subscription;
+
   @override
+  // Langkah 2 Praktikum 4
   void initState() {
+    numberStream = NumberStream();
+    numberStreamController = numberStream.controller;
+    Stream stream = numberStreamController.stream;
+    subscription = stream.listen((event) {
+      setState(() {
+        lastNumber = event;
+      });
+    });
+    subscription.onError((error) {
+      setState(() {
+        lastNumber = -1;
+      });
+    });
+    subscription.onDone(() {
+      print("OnDone was called");
+    });
+    super.initState();
+  }
+
+  /*void initState() {
     // Langkah 8 Praktikum 2
     numberStream = NumberStream();
     numberStreamController = numberStream.controller;
@@ -69,12 +93,13 @@ class _StreamHomePageState extends State<StreamHomePage> {
     super.initState();
     // colorStream = ColorStream();
     // changeColor();
-  }
+  }*/
 
   // Langkah 9 Praktikum 2
   @override
   void dispose() {
-    numberStreamController.close();
+    subscription.cancel();
+    // numberStreamController.close();
     super.dispose();
   }
 
@@ -93,6 +118,11 @@ class _StreamHomePageState extends State<StreamHomePage> {
             ElevatedButton(
               onPressed: () => addRandomNumber(),
               child: Text('New Random Number'),
+            ),
+            // Praktikum 4 Langkah 7
+            ElevatedButton(
+              onPressed: () => stopStream(),
+              child: Text('Stop Subscription'),
             ),
           ],
         ),
@@ -119,8 +149,21 @@ class _StreamHomePageState extends State<StreamHomePage> {
   // Langkah 10 Praktikum 2
   void addRandomNumber() {
     Random random = Random();
-    int myNum = random.nextInt(100);
-    numberStream.addNumberToSink(myNum);
+    int myNum = random.nextInt(10);
+    // Praktikum 4 Langkah 8
+    if (!numberStreamController.isClosed) {
+      numberStream.addNumberToSink(myNum);
+    } else {
+      setState(() {
+        lastNumber = -1;
+      });
+    }
+    // numberStream.addNumberToSink(myNum);
     // numberStream.addError();
+  }
+
+  // Praktikum 4 Langkah 5
+  void stopStream() {
+    numberStreamController.close();
   }
 }

@@ -392,7 +392,7 @@ class _StreamHomePageState extends State<StreamHomePage> {
   // Langkah 10 Praktikum 2
   void addRandomNumber() {
     Random random = Random();
-    int myNum = random.nextInt(100);
+    int myNum = random.nextInt(10);
     numberStream.addNumberToSink(myNum);
   }
 }
@@ -420,7 +420,7 @@ Lakukan running pada aplikasi Flutter Anda, maka akan terlihat seperti gambar be
   - Langkah 10: `addRandomNumber()`
     Maksud dari kode `addRandomNumber()` adalah untuk **menghasilkan data baru dan memasukkannya ke dalam _stream_**.
     1. `Random random = Random();`: Membuat generator angka acak.
-    2. `int myNum = random.nextInt(100);`: Menghasilkan angka acak baru antara 0 dan 99.
+    2. `int myNum = random.nextInt(100);`: Menghasilkan angka acak baru antara 0 dan 9.
     3. `numberStream.addNumberToSink(myNum);`: Merupakan aksi kunci. Kode ini mengambil angka acak (`myNum`) dan "menuangkannya" ke dalam _stream_ (melalui `sink`).
 
 - Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
@@ -458,7 +458,7 @@ Lakukan running pada aplikasi Flutter Anda, maka akan terlihat seperti gambar be
 ```dart
   void addRandomNumber() {
     Random random = Random();
-    // int myNum = random.nextInt(100);
+    // int myNum = random.nextInt(10);
     // numberStream.addNumberToSink(myNum);
     numberStream.addError();
   }
@@ -483,7 +483,7 @@ Lakukan running pada aplikasi Flutter Anda, maka akan terlihat seperti gambar be
   ```dart
   void addRandomNumber() {
     Random random = Random();
-    int myNum = random.nextInt(100);
+    int myNum = random.nextInt(10);
     numberStream.addNumberToSink(myNum);
     // numberStream.addError();
   }
@@ -546,7 +546,7 @@ class _StreamHomePageState extends State<StreamHomePage> {
 
 ### Run
 
-**Run** atau tekan **F5** untuk melihat hasilnya jika memang belum running. Bisa juga lakukan **hot restart** jika aplikasi sudah running. Maka hasilnya akan seperti gambar berikut ini.
+**Run** atau tekan **F5** untuk melihat hasilnya jika memang belum running. Bisa juga lakukan **hot restart** jika aplikasi sudah running. Maka hasilnya akan seperti gambar berikut ini. Anda akan melihat tampilan angka dari 0 hingga 90.
 
 ![Langkah 4](images/prak3_langkah4.png)
 
@@ -559,15 +559,140 @@ class _StreamHomePageState extends State<StreamHomePage> {
   1. Langkah 1 (`late StreamTransformer transformer;`) adalah **deklarasi variabel** dan akan diberi nilainya nanti sebelum digunakan (makanya menggunakan `late`).
   2. Langkah 2 (`transformer = StreamTransformer.fromHandlers(...)`) merupakan **logic** dari _transformer_.
 
-  - **`handleData: (value, sink) { sink.add(value * 10); }`** adalah aturan utama. Dikatakan: "Setiap kali ada data angka (`value`) yang masuk, **kalikan dengan 10**, lalu kirimkan (`sink.add`) hasil perkalian itu ke pipa keluaran.". _Contoh:_ Angka `25` masuk -> diubah jadi `250` -> `250` dikirim keluar.
+  - **`handleData: (value, sink) { sink.add(value * 10); }`** adalah aturan utama. Dikatakan: "Setiap kali ada data angka (`value`) yang masuk, **kalikan dengan 10**, lalu kirimkan (`sink.add`) hasil perkalian itu ke pipa keluaran.". _Contoh:_ Angka `2` masuk -> diubah jadi `20` -> `20` dikirim keluar.
   - **`handleError: (error, trace, sink) { sink.add(-1); }`** merupakan error handling. Dikatakan: "Jika ada _error_ yang masuk ke pipa, jangan teruskan errornya. Sebaliknya, tangkap error itu dan kirimkan angka `-1` sebagai gantinya."
 
   3. Langkah 3: `stream.transform(transformer).listen(...)` merupakan **penerapan** filter tersebut ke pipa _stream_.
 
-  Hasil akhirnya adalah `setState` (yang menampilkan angka di layar) tidak lagi menerima angka acak asli (misal `25`), tetapi menerima **angka yang sudah di-transformasi** (yaitu `250`).
+  Hasil akhirnya adalah `setState` (yang menampilkan angka di layar) tidak lagi menerima angka acak asli (misal `2`), tetapi menerima **angka yang sudah di-transformasi** (yaitu `20`).
 
 - Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
 
   ![Langkah 4](images/prak3_langkah4.gif)
 
 - Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 8**". ꪜ
+
+## Praktikum 4: Subscribe ke stream events
+
+### Update kode `main.dart`:
+
+```dart
+// Existing code
+
+class _StreamHomePageState extends State<StreamHomePage> {
+  // Existing code
+  // Langkah 1 Praktikum 4
+  late StreamSubscription subscription;
+
+  @override
+  // Langkah 2 Praktikum 4
+  void initState() {
+    numberStream = NumberStream();
+    numberStreamController = numberStream.controller;
+    Stream stream = numberStreamController.stream;
+    subscription = stream.listen((event) {
+      setState(() {
+        lastNumber = event;
+      });
+    });
+    subscription.onError((error) {
+      setState(() {
+        lastNumber = -1;
+      });
+    });
+    subscription.onDone(() {
+      print("OnDone was called");
+    });
+    super.initState();
+  }
+
+  // Langkah 9 Praktikum 2
+  @override
+  void dispose() {
+    subscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Stream Dio')),
+      // Langkah 11 Praktikum 2
+      body: SizedBox(
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(lastNumber.toString()),
+            ElevatedButton(
+              onPressed: () => addRandomNumber(),
+              child: Text('New Random Number'),
+            ),
+            // Praktikum 4 Langkah 7
+            ElevatedButton(
+              onPressed: () => stopStream(),
+              child: Text('Stop Subscription'),
+            ),
+          ],
+        ),
+      ),
+      // body: Container(decoration: BoxDecoration(color: bgColor)),
+    );
+  }
+
+  // Existing code
+
+  // Langkah 10 Praktikum 2
+  void addRandomNumber() {
+    Random random = Random();
+    int myNum = random.nextInt(10);
+    if (!numberStreamController.isClosed) {
+      numberStream.addNumberToSink(myNum);
+    } else {
+      setState(() {
+        lastNumber = -1;
+      });
+    }
+  }
+
+  // Praktikum 4 Langkah 5
+  void stopStream() {
+    numberStreamController.close();
+  }
+}
+```
+
+### Run
+
+Anda akan melihat dua button seperti gambar berikut.
+
+![Langkah 9](images/prak4_langkah9.png)
+
+### Tekan button ‘Stop Subscription'
+
+Anda akan melihat pesan di Debug Console seperti berikut.
+
+![Langkah 10](images/prak4_langkah10.png)
+
+**Soal 9**
+
+- Jelaskan maksud kode langkah 2, 6 dan 8 tersebut!
+
+  Kode langkah 2 (`initState`) bermaksud untuk memulai langganan (subscription) ke stream dan menyimpan referensi langganan tersebut. `subscription = stream.listen(...)` merupakan inti dari langkah ini yaitu mulai "mendengarkan" stream dan, yang paling penting, menyimpan objek langganan itu ke dalam variabel `subscription` agar bisa mengontrolnya nanti.
+
+  Kode langkah 6 (`dispose`) bermaksud untuk membersihkan subscription saat halaman ditutup guna mencegah kebocoran memori (_memory leak_). Ini adalah kode "pembersihan" yang berjalan secara otomatis saat halaman ditutup. `subscription.cancel();` adalah perintah untuk "berhenti berlangganan". Saat halaman ditutup, stream diberi tahu bahwa halaman ini tidak lagi tertarik menerima data. Ini penting karena jika tidak membatalkannya, subscription akan tetap hidup di memori bahkan setelah halaman ditutup. Ini akan membuang-buang sumber daya dan dapat menyebabkan error jika mencoba memperbarui halaman yang sudah tidak ada.
+
+  Kode langkah 8 (`addRandomNumber`) bermaksud untuk menambahkan data baru ke stream dengan aman, mencegah crash jika stream sudah ditutup.
+
+  - `if (!numberStreamController.isClosed)` adalah baris terpenting. Kode ini memeriksa, "Apakah controller stream-nya masih terbuka?"
+  - Jika ya (masih terbuka), stream akan mengirimkan angka baru: `numberStream.addNumberToSink(myNum)`.
+  - Jika tidak (sudah ditutup oleh tombol "Stop Subscription"), ia akan menjalankan blok `else` dan mengubah `lastNumber` menjadi -1.
+
+  Ini penting karena jika mencoba menambahkan data (`.add()`) ke `StreamController` yang sudah ditutup (`.close()`), aplikasi akan crash. Langkah 8 ini mencegah crash tersebut.
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
+
+  ![Langkah 9](images/prak4_langkah9.gif)
+
+- Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 9**". ꪜ
