@@ -949,3 +949,148 @@ Hasilnya, setiap detik akan tampil angka baru seperti berikut.
   ![Langkah 8](images/prak6_langkah8.gif)
 
 - Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 12**". ꪜ
+
+## Praktikum 7: BLoC Pattern
+
+### Kode program `random_bloc.dart`:
+
+```dart
+import 'dart:async';
+import 'dart:math';
+
+class RandomNumberBloc {
+  // StreamController for input events
+  final _generateRandomController = StreamController<void>();
+  // StreamController for output
+  final _randomNumberController = StreamController<int>();
+  // Input Sink
+  Sink<void> get generateRandom => _generateRandomController.sink;
+  // Output Stream
+  Stream<int> get randomNumber => _randomNumberController.stream;
+  // _secondsStreamController.sink;
+
+  RandomNumberBloc() {
+    _generateRandomController.stream.listen((_) {
+      final random = Random().nextInt(
+        10,
+      ); // Generate random number between 0 and 9
+      _randomNumberController.sink.add(random);
+    });
+  }
+
+  void dispose() {
+    _generateRandomController.close();
+    _randomNumberController.close();
+  }
+}
+```
+
+### Kode program `random_screen.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'random_bloc.dart';
+
+class RandomScreen extends StatefulWidget {
+  const RandomScreen({super.key});
+
+  @override
+  State<RandomScreen> createState() => _RandomScreenState();
+}
+
+class _RandomScreenState extends State<RandomScreen> {
+  final _bloc = RandomNumberBloc();
+
+  @override
+  void dispose() {
+    _bloc.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Random Number Dio')),
+      body: Center(
+        child: StreamBuilder<int>(
+          stream: _bloc.randomNumber,
+          initialData: 0,
+          builder: (context, snapshot) {
+            return Text(
+              'Random Number: ${snapshot.data}',
+              style: const TextStyle(fontSize: 24),
+            );
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _bloc.generateRandom.add(null),
+        child: const Icon(Icons.refresh),
+      ),
+    );
+  }
+}
+```
+
+### Kode program `main.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'random_screen.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'BLoC Demo Dio',
+      theme: ThemeData(primarySwatch: Colors.indigo),
+      home: const RandomScreen(),
+    );
+  }
+}
+```
+
+### Run
+
+Run aplikasi, maka Anda akan melihat angka acak antara angka 0 sampai 9 setiap kali menekan tombol `FloactingActionButton`.
+
+![Output](images/prak7_output.gif)
+
+**Soal 13**
+
+- Jelaskan maksud praktikum ini ! Dimanakah letak konsep pola BLoC-nya ?
+
+  Maksud dari praktikum ini adalah untuk memisahkan total antara logika bisnis (proses membuat angka acak) dengan tampilan UI (tampilan layar yang menampilkan angka tersebut dan tombol untuk memicunya). Alur aplikasi ini adalah:
+
+  - Bermula dengan "Random Number: 0".
+  - Setiap kali tombol refresh (`FloatingActionButton`) ditekan, tombol itu memberi tahu BLoC untuk membuat angka baru.
+  - BLoC membuat angka baru dan memberi tahu UI bahwa ada data baru.
+  - UI (melalui `StreamBuilder`) secara otomatis memperbarui dirinya untuk menampilkan angka baru tersebut.
+
+  Dimanakah letak konsep pola BLoC-nya ?
+
+  Konsep BLoC sepenuhnya berada di dalam file `lib/random_bloc.dart` dan cara file itu berinteraksi dengan `lib/random_screen.dart`. Pola BLoC adalah tentang mengelola state (data) aplikasi dengan menggunakan Sinks (untuk input) dan Streams (untuk output).
+
+  1. Komponen BLoC (Logic) <br>
+     Ini adalah class `RandomNumberBloc` di `lib/random_bloc.dart`. Class ini sama sekali "buta" terhadap UI. Ia tidak tahu ada `Text` atau `FloatingActionButton`.
+  2. Input (Sink) <br>
+     Merupakan "kotak masuk" untuk BLoC, tempat UI mengirimkan perintah atau _event_ (`Sink<void> get generateRandom => _generateRandomController.sink;`). Tombol `FloatingActionButton` menggunakan sink ini untuk mengirim _event_ (perintah "buat angka baru") saat ditekan (`onPressed: () => _bloc.generateRandom.add(null)`).
+  3. Output (Stream) <br>
+     Ini adalah "kotak keluar" dari BLoC, tempat BLoC mengirimkan state (data) baru ke UI (`Stream<int> get randomNumber => _randomNumberController.stream;`). `StreamBuilder` "mendengarkan" stream ini dan secara otomatis membangun ulang `Text` setiap kali ada angka baru yang keluar.
+  4. Logika Bisnis (Business Logic) <br>
+     Merupakan "jembatan" di dalam BLoC yang menghubungkan input ke output. Logika ini ada di dalam konstruktor `RandomNumberBloc`. Ia mendengarkan input stream (`_generateRandomController.stream`), menjalankan logika (membuat angka acak), dan mengirimkan hasilnya ke output stream (`_randomNumberController.sink.add(random)`).
+
+  Pemisahan ini merupakan inti dari BLoC, yang membuat kode menjadi sangat terorganisir dan mudah diuji.
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
+
+  ![Output](images/prak7_output.gif)
+
+- Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 13**". ꪜ
