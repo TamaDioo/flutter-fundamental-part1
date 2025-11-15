@@ -718,7 +718,7 @@ class _StreamHomePageState extends State<StreamHomePage> {
     subscription = stream.listen((event) {
       setState(() {
         // Praktikum 5 Langkah 2
-        values += ' $event - ';
+        values += '$event - ';
         // lastNumber = event;
       });
     });
@@ -734,7 +734,7 @@ class _StreamHomePageState extends State<StreamHomePage> {
     // Praktikum 5 Langkah 2
     subscription2 = stream.listen((event) {
       setState(() {
-        values += ' $event - ';
+        values += '$event - ';
       });
     });
     super.initState();
@@ -821,8 +821,8 @@ Tekan button ‘**New Random Number**' beberapa kali, maka akan tampil teks angk
      - `subscription2 = stream.listen(...)`
 
   2. Saat menekan tombol "New Random Number", method `addRandomNumber()` menambahkan **satu** angka acak (misalnya, angka `5`) ke dalam _stream_. Karena _stream_ ini adalah _broadcast_, ia mengirimkan angka `5` tersebut ke **semua listenernya**:
-     - `subscription` menerima angka `5` dan menjalankan kodenya: `setState(() { values += ' 5 - '; });`.
-     - `subscription2` **juga** menerima angka `5` yang sama dan menjalankan kodenya: `setState(() { values += ' 5 - '; });`.
+     - `subscription` menerima angka `5` dan menjalankan kodenya: `setState(() { values += '5 - '; });`.
+     - `subscription2` **juga** menerima angka `5` yang sama dan menjalankan kodenya: `setState(() { values += '5 - '; });`.
 
   Akibatnya, untuk setiap **satu** angka yang dibuat, angka tersebut ditambahkan ke string `values` **dua kali**, sehingga string di layar bertambah sebanyak dua kali.
 
@@ -831,3 +831,121 @@ Tekan button ‘**New Random Number**' beberapa kali, maka akan tampil teks angk
   ![Langkah 6](images/prak5_langkah6.gif)
 
 - Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 10,11**". ꪜ
+
+## Praktikum 6: StreamBuilder
+
+### Kode program `stream.dart`:
+
+```dart
+import 'dart:math';
+
+class NumberStream {
+  Stream<int> getNumbers() async* {
+    yield* Stream.periodic(const Duration(seconds: 1), (int t) {
+      Random random = Random();
+      int myNum = random.nextInt(10);
+      return myNum;
+    });
+  }
+}
+```
+
+### Kode program `main.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'stream.dart';
+import 'dart:async';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Stream Dio',
+      theme: ThemeData(primarySwatch: Colors.indigo),
+      home: const StreamHomePage(),
+    );
+  }
+}
+
+class StreamHomePage extends StatefulWidget {
+  const StreamHomePage({super.key});
+
+  @override
+  State<StreamHomePage> createState() => _StreamHomePageState();
+}
+
+class _StreamHomePageState extends State<StreamHomePage> {
+  late Stream<int> numberStream;
+
+  @override
+  void initState() {
+    numberStream = NumberStream().getNumbers();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Stream Dio')),
+      body: StreamBuilder(
+        stream: numberStream,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            print('Error!');
+          }
+          if (snapshot.hasData) {
+            return Center(
+              child: Text(
+                snapshot.data.toString(),
+                style: const TextStyle(fontSize: 96),
+              ),
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
+        },
+      ),
+    );
+  }
+}
+```
+
+### Run
+
+Hasilnya, setiap detik akan tampil angka baru seperti berikut.
+
+![Langkah 8](images/prak6_langkah8.gif)
+
+**Soal 12**
+
+- Jelaskan maksud kode pada langkah 3 dan 7 !
+
+  Maksud kode langkah 3 adalah untuk membuat stream yang secara otomatis menghasilkan data baru (angka acak) setiap satu detik, tanpa perlu dipicu oleh tombol.
+
+  - `Stream<int> getNumbers() async*` adalah asynchronous generator. Berbeda dengan `StreamController` (yang manual), `async*` adalah fungsi yang menghasilkan data stream dari waktu ke waktu.
+  - `yield* Stream.periodic(...)` adalah inti kodenya.
+    - `Stream.periodic(const Duration(seconds: 1), ...)`: Membuat stream baru yang "berdetak" (mengirimkan event) setiap 1 detik.
+    - `Random().nextInt(10)`: Setiap kali "detak" itu terjadi, kode ini akan menghasilkan angka acak baru antara 0 dan 9.
+    - `yield*`: Meneruskan setiap angka acak yang baru dibuat itu ke dalam stream `getNumbers()`.
+
+  Maksud kode langkah 7 (`StreamBuilder`) adalah untuk menampilkan data dari stream di layar (UI) secara otomatis, tanpa perlu `setState` manual.
+
+  - `body: StreamBuilder(...)` adalah widget khusus dari Flutter yang dirancang untuk "mendengarkan" stream dan rebuild UI secara otomatis setiap kali ada data baru.
+  - `builder: (context, snapshot)` adalah fungsi yang dipanggil `StreamBuilder` setiap kali stream mengirimkan data baru (atau error, atau selesai).
+    - `snapshot.hasData` memeriksa apakah data sudah tiba.
+    - `return Center(child: Text(snapshot.data.toString(), ...),);` Jika data ada, `StreamBuilder` secara otomatis menampilkan data tersebut (`snapshot.data`) di layar.
+
+  Jadi, langkah 3 adalah sumber data (penghasil angka acak otomatis) dan langkah 7 adalah tampilan UI-nya (otomatis menampilkan angka yang dihasilkan).
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
+
+  ![Langkah 8](images/prak6_langkah8.gif)
+
+- Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 12**". ꪜ

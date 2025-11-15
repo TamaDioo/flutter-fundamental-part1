@@ -54,7 +54,7 @@ class _StreamHomePageState extends State<StreamHomePage> {
     subscription = stream.listen((event) {
       setState(() {
         // Praktikum 5 Langkah 2
-        values += ' $event - ';
+        values += '$event - ';
         // lastNumber = event;
       });
     });
@@ -70,7 +70,7 @@ class _StreamHomePageState extends State<StreamHomePage> {
     // Praktikum 5 Langkah 2
     subscription2 = stream.listen((event) {
       setState(() {
-        values += ' $event - ';
+        values += '$event - ';
       });
     });
     super.initState();
