@@ -40,15 +40,22 @@ class _StreamHomePageState extends State<StreamHomePage> {
   // Langkah 1 Praktikum 4
   late StreamSubscription subscription;
 
+  // Praktikum 5 Langkah 1
+  late StreamSubscription subscription2;
+  String values = '';
+
   @override
   // Langkah 2 Praktikum 4
   void initState() {
     numberStream = NumberStream();
     numberStreamController = numberStream.controller;
-    Stream stream = numberStreamController.stream;
+    // Praktikum 5 Langkah 4
+    Stream stream = numberStreamController.stream.asBroadcastStream();
     subscription = stream.listen((event) {
       setState(() {
-        lastNumber = event;
+        // Praktikum 5 Langkah 2
+        values += ' $event - ';
+        // lastNumber = event;
       });
     });
     subscription.onError((error) {
@@ -58,6 +65,13 @@ class _StreamHomePageState extends State<StreamHomePage> {
     });
     subscription.onDone(() {
       print("OnDone was called");
+    });
+
+    // Praktikum 5 Langkah 2
+    subscription2 = stream.listen((event) {
+      setState(() {
+        values += ' $event - ';
+      });
     });
     super.initState();
   }
@@ -114,7 +128,9 @@ class _StreamHomePageState extends State<StreamHomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(lastNumber.toString()),
+            // Praktikum 5 Langkah 5
+            Text(values),
+            // Text(lastNumber.toString()),
             ElevatedButton(
               onPressed: () => addRandomNumber(),
               child: Text('New Random Number'),

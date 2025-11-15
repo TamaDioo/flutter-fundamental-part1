@@ -696,3 +696,138 @@ Anda akan melihat pesan di Debug Console seperti berikut.
   ![Langkah 9](images/prak4_langkah9.gif)
 
 - Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 9**". ꪜ
+
+## Praktikum 5: Multiple stream subscriptions
+
+### Menambahkan variabel dan mengedit `initState()` class `_StreamHomePageState`:
+
+```dart
+class _StreamHomePageState extends State<StreamHomePage> {
+  // Existing code
+
+  // Praktikum 5 Langkah 1
+  late StreamSubscription subscription2;
+  String values = '';
+
+  @override
+  // Langkah 2 Praktikum 4
+  void initState() {
+    numberStream = NumberStream();
+    numberStreamController = numberStream.controller;
+    Stream stream = numberStreamController.stream;
+    subscription = stream.listen((event) {
+      setState(() {
+        // Praktikum 5 Langkah 2
+        values += ' $event - ';
+        // lastNumber = event;
+      });
+    });
+    subscription.onError((error) {
+      setState(() {
+        lastNumber = -1;
+      });
+    });
+    subscription.onDone(() {
+      print("OnDone was called");
+    });
+
+    // Praktikum 5 Langkah 2
+    subscription2 = stream.listen((event) {
+      setState(() {
+        values += ' $event - ';
+      });
+    });
+    super.initState();
+  }
+
+  // Existing code
+
+}
+```
+
+### Run
+
+Lakukan run maka akan tampil error seperti gambar berikut.
+
+![Langkah 3](images/prak5_langkah3.jpg)
+
+**Soal 10**
+
+- Jelaskan mengapa error itu bisa terjadi ?
+
+  Error tersebut terjadi karena mencoba mendaftarkan dua listener ke stream yang sama, padahal stream tersebut adalah stream **single-subscription** (hanya boleh satu listener). Di file `lib/stream.dart`, `StreamController<int>()` secara default adalah controller untuk single-subscription stream. Artinya, hanya satu objek `StreamSubscription` yang boleh mendengarkan stream tersebut dalam satu waktu. Sehingga inilah yang terjadi di `initState()`:
+
+  - Panggilan `.listen()` yang pertama (`subscription = ...`) berhasil. `subscription` menjadi listener yang sah.
+  - Ketika kode mencoba menjalankan panggilan `.listen()` yang kedua (`subscription2 = ...`) pada objek `stream` yang sama, stream tersebut mendeteksi bahwa ia sudah memiliki satu listener.
+  - Karena ia adalah single-subscription stream, ia tidak mengizinkan listener kedua dan langsung melemparkan error "Bad state: Stream has already been listened to," yang menyebabkan crash (layar merah) seperti pada gambar.
+
+#### Mengedit method `initState()` dan `build`:
+
+```dart
+  void initState() {
+    numberStream = NumberStream();
+    numberStreamController = numberStream.controller;
+    // Praktikum 5 Langkah 4
+    Stream stream = numberStreamController.stream.asBroadcastStream();
+    // Existing code
+  }
+
+   @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Stream Dio')),
+      // Langkah 11 Praktikum 2
+      body: SizedBox(
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Praktikum 5 Langkah 5
+            Text(values),
+            // Text(lastNumber.toString()),
+            ElevatedButton(
+              onPressed: () => addRandomNumber(),
+              child: Text('New Random Number'),
+            ),
+            // Praktikum 4 Langkah 7
+            ElevatedButton(
+              onPressed: () => stopStream(),
+              child: Text('Stop Subscription'),
+            ),
+          ],
+        ),
+      ),
+      // body: Container(decoration: BoxDecoration(color: bgColor)),
+    );
+  }
+```
+
+### Run
+
+Tekan button ‘**New Random Number**' beberapa kali, maka akan tampil teks angka terus bertambah sebanyak dua kali.
+
+![Langkah 6](images/prak5_langkah6.gif)
+
+**Soal 11**
+
+- Jelaskan mengapa hal itu bisa terjadi ?
+
+  Alasan mengapa angka bertambah dua kali setiap menekan tombol adalah karena sekarang terdapat **dua listener aktif** yang mendengarkan _stream_ yang sama. Berikut adalah rinciannya:
+
+  1. Di `initState()`, _stream_ diubah menggunakan `.asBroadcastStream()`. Ini menyelesaikan error "Stream has already been listened to" dari praktikum sebelumnya. _Broadcast stream_ memang dirancang untuk bisa memiliki banyak listener. Setelah itu, dibuat **dua** subscription terpisah ke _stream_ yang sama:
+
+     - `subscription = stream.listen(...)`
+     - `subscription2 = stream.listen(...)`
+
+  2. Saat menekan tombol "New Random Number", method `addRandomNumber()` menambahkan **satu** angka acak (misalnya, angka `5`) ke dalam _stream_. Karena _stream_ ini adalah _broadcast_, ia mengirimkan angka `5` tersebut ke **semua listenernya**:
+     - `subscription` menerima angka `5` dan menjalankan kodenya: `setState(() { values += ' 5 - '; });`.
+     - `subscription2` **juga** menerima angka `5` yang sama dan menjalankan kodenya: `setState(() { values += ' 5 - '; });`.
+
+  Akibatnya, untuk setiap **satu** angka yang dibuat, angka tersebut ditambahkan ke string `values` **dua kali**, sehingga string di layar bertambah sebanyak dua kali.
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
+
+  ![Langkah 6](images/prak5_langkah6.gif)
+
+- Lalu lakukan commit dengan pesan "**W12: Jawaban Soal 10,11**". ꪜ
