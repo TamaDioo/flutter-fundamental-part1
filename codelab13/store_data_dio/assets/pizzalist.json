@@ -8,12 +8,15 @@
   },
   {
     "id": 2,
+    "pizzaName": "Marinara",
+    "description": "Pizza with tomato, garlic and oregano",
     "price": 7.5,
     "imageUrl": "images/marinara.png"
   },
   {
     "id": 3,
     "pizzaName": "Napoli",
+    "description": "Pizza with tomato, garlic and anchovies",
     "price": 9.5,
     "imageUrl": "images/marinara.png"
   },
@@ -21,14 +24,14 @@
     "id": 4,
     "pizzaName": "Carciofi",
     "description": "Pizza with tomato, fresh mozzarella and artichokes",
-    "price": 0,
+    "price": 8.8,
     "imageUrl": "images/marinara.png"
   },
   {
     "id": 5,
     "pizzaName": "Bufala",
     "description": "Pizza with tomato, buffalo mozzarella and basil",
-    "price": 0,
+    "price": 12.5,
     "imageUrl": "images/marinara.png"
   }
 ]

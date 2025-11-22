@@ -240,7 +240,7 @@ class Pizza {
 
 Setelah mengimplementasikan semua perbaikan tipe data, aplikasi akan berjalan, tetapi mungkin menampilkan "null" di UI jika ada bidang yang hilang atau gagal diparsing (seperti pizzaName atau description).
 
-![Langkah 9](images/prak2_langkah9.jpg)
+![Langkah 9](images/prak2_langkah9.png)
 
 ### Menambahkan Operator Ternary untuk Output User-Friendly
 
@@ -261,11 +261,73 @@ Setelah mengimplementasikan semua perbaikan tipe data, aplikasi akan berjalan, t
 
 Jalankan aplikasi. Sekarang data yang tidak konsisten telah ditangani dengan baik, dan UI tidak menampilkan nilai null.
 
-![Langkah 11](images/prak2_langkah11.jpg)
-
 ![Langkah 11](images/prak2_langkah11.png)
 
 **Soal 4**
 
 - Capture hasil running aplikasi Anda, kemudian impor ke laporan praktikum Anda! ꪜ
 - Lalu lakukan commit dengan pesan "**W13: Jawaban Soal 4**". ꪜ
+
+## Praktikum 3: Menangani error JSON
+
+### Update Kode Program file `lib/model/pizza.dart`:
+
+```dart
+const keyId = 'id';
+const keyName = 'pizzaName';
+const keyDescription = 'description';
+const keyPrice = 'price';
+const keyImage = 'imageUrl';
+
+class Pizza {
+  final int id;
+  final String pizzaName;
+  final String description;
+  final double price;
+  final String imageUrl;
+
+  Pizza.fromJson(Map<String, dynamic> json)
+    : id = int.tryParse(json[keyId].toString()) ?? 0,
+      pizzaName = json[keyName] != null ? json[keyName].toString() : 'No name',
+      description = json[keyDescription] != null
+          ? json[keyDescription].toString()
+          : '',
+      price = double.tryParse(json[keyPrice].toString()) ?? 0,
+      imageUrl = json[keyImage] ?? '';
+
+  Map<String, dynamic> toJson() {
+    return {
+      keyId: id,
+      keyName: pizzaName,
+      keyDescription: description,
+      keyPrice: price,
+      keyImage: imageUrl,
+    };
+  }
+}
+```
+
+### Run
+
+Jalankan aplikasi. Tidak akan ada perubahan visual, tetapi kode Anda kini lebih safe dan maintainable.
+
+![Langkah 4](images/prak3_langkah4.png)
+
+**Soal 5**
+
+- Jelaskan maksud kode lebih safe dan maintainable!
+
+  Perubahan kode tersebut membuat aplikasi lebih safe (aman) dan maintainable (mudah dikelola) karena penggunaan konstanta untuk key JSON (seperti `keyId`, `keyName`, dll) menggantikan penulisan string manual secara langsung.
+
+  Lebih maintainable maksudnya adalah kode lebih mudah untuk diperbarui atau diubah di masa depan tanpa harus melakukan banyak edit di berbagai tempat. Bayangkan jika API server berubah dan key JSON `'pizzaName'` diganti menjadi `'productName'`.
+
+  - Sebelumnya harus mencari setiap tulisan `'pizzaName'` di dalam file dan mengubahnya satu per satu (di `fromJson`, `toJson`, dan mungkin tempat lain).
+  - Sekarang hanya perlu mengubah nilai konstanta di satu tempat saja, yaitu di baris `const keyName = 'pizzaName';`. Seluruh kode yang menggunakan `keyName` akan otomatis ikut berubah.
+
+  Lebih safe maksudnya adalah kode lebih terlindungi dari kesalahan manusia (human error) seperti _typo_ (salah ketik) yang bisa menyebabkan bug saat aplikasi berjalan.
+
+  - Sebelumnya, jika tidak sengaja mengetik `'pizaName'` (kurang satu 'z') di dalam `fromJson`, Dart tidak akan menganggapnya error saat compile. Aplikasi akan tetap berjalan, tetapi data pizza tidak akan muncul (error logika/runtime) karena kuncinya tidak cocok.
+  - Sekarang, jika salah mengetik nama variabel konstanta, misalnya `keyNme` (kurang 'a'), code editor atau compiler akan langsung memberi tahu bahwa variabel tersebut tidak ditemukan. Ini mencegah error tersebut lolos ke aplikasi yang sedang berjalan.
+
+- Capture hasil praktikum Anda dan lampirkan di README. ꪜ
+- Lalu lakukan commit dengan pesan "**W13: Jawaban Soal 5**". ꪜ
