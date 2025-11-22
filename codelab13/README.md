@@ -331,3 +331,112 @@ Jalankan aplikasi. Tidak akan ada perubahan visual, tetapi kode Anda kini lebih 
 
 - Capture hasil praktikum Anda dan lampirkan di README. ꪜ
 - Lalu lakukan commit dengan pesan "**W13: Jawaban Soal 5**". ꪜ
+
+## Praktikum 4: SharedPreferences
+
+### Update Kode Program `main.dart`:
+
+```dart
+import 'dart:convert';
+import './model/pizza.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// Existing code
+
+class _MyHomePageState extends State<MyHomePage> {
+  String pizzaString = '';
+  List<Pizza> myPizzas = [];
+  int appCounter = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    readAndWritePreference();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Shared Preferences Dio')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text('You have opened the app $appCounter times.'),
+            ElevatedButton(onPressed: () {}, child: Text('Reset Counter')),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Existing code
+
+  Future readAndWritePreference() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    appCounter = prefs.getInt('appCounter') ?? 0;
+    appCounter++;
+    await prefs.setInt('appCounter', appCounter);
+    setState(() {
+      appCounter = appCounter;
+    });
+  }
+}
+```
+
+### Run
+
+Aplikasi sekarang akan menampilkan "You have opened the app 1 times" (jika ini pembukaan pertama).
+
+![Langkah 12](images/prak4_langkah12.png)
+
+### Membuat method `deletePreference()` dan memanggilnya
+
+```dart
+class _MyHomePageState extends State<MyHomePage> {
+  // Existing code
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Shared Preferences Dio')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text('You have opened the app $appCounter times.'),
+            ElevatedButton(
+              onPressed: () {
+                deletePreference();
+              },
+              child: Text('Reset Counter'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Existing code
+
+  Future deletePreference() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    setState(() {
+      appCounter = 0;
+    });
+  }
+}
+```
+
+### Run
+
+Jalankan aplikasi. Tombol reset sekarang akan berfungsi, menghapus semua pasangan kunci-nilai dan mereset hitungan.
+
+![Langkah 15](images/prak4_langkah15.gif)
+
+**Soal 6**
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
+- Lalu lakukan commit dengan pesan "**W13: Jawaban Soal 6**". ꪜ
