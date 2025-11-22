@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,6 +39,10 @@ class _MyHomePageState extends State<MyHomePage> {
   String tempPath = '';
   late File myFile;
   String fileText = '';
+  final pwdController = TextEditingController();
+  String myPass = '';
+  final storage = const FlutterSecureStorage();
+  final myKey = 'myPass';
 
   @override
   void initState() {
@@ -58,7 +63,34 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Path Provider Dio')),
-      body: Column(
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(controller: pwdController),
+            ElevatedButton(
+              child: const Text('Save Value'),
+              onPressed: () {
+                writeToSecureStorage();
+              },
+            ),
+            ElevatedButton(
+              child: Text('Read Value'),
+              onPressed: () {
+                readFromSecureStorage().then((value) {
+                  setState(() {
+                    myPass = value;
+                  });
+                });
+              },
+            ),
+            Text(myPass),
+          ],
+        ),
+      ),
+
+      /* body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Text('Doc path: $documentsPath'),
@@ -70,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Text(fileText),
         ],
-      ),
+      ), */
 
       /* body: Center(
         child: Column(
@@ -169,5 +201,14 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       return false;
     }
+  }
+
+  Future writeToSecureStorage() async {
+    await storage.write(key: myKey, value: pwdController.text);
+  }
+
+  Future<String> readFromSecureStorage() async {
+    String secret = await storage.read(key: myKey) ?? '';
+    return secret;
   }
 }

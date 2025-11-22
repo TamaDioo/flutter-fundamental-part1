@@ -596,3 +596,97 @@ Jalankan aplikasi. Setelah menekan tombol 'Read File', konten yang ditulis (Marg
 
 - Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
 - Lalu lakukan commit dengan pesan "**W13: Jawaban Soal 8**". ꪜ
+
+## Praktikum 7: Menyimpan data dengan enkripsi/dekripsi
+
+### Update Kode Program `main.dart`:
+
+```dart
+import 'dart:convert';
+import './model/pizza.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+// Existing code
+
+class _MyHomePageState extends State<MyHomePage> {
+  String pizzaString = '';
+  List<Pizza> myPizzas = [];
+  int appCounter = 0;
+  String documentsPath = '';
+  String tempPath = '';
+  late File myFile;
+  String fileText = '';
+  final pwdController = TextEditingController();
+  String myPass = '';
+  final storage = const FlutterSecureStorage();
+  final myKey = 'myPass';
+
+  @override
+  void initState() {
+    getPaths().then((_) {
+      myFile = File('$documentsPath/pizzas.txt');
+      writeFile();
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Path Provider Dio')),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(controller: pwdController),
+            ElevatedButton(
+              child: const Text('Save Value'),
+              onPressed: () {
+                writeToSecureStorage();
+              },
+            ),
+            ElevatedButton(
+              child: Text('Read Value'),
+              onPressed: () {
+                readFromSecureStorage().then((value) {
+                  setState(() {
+                    myPass = value;
+                  });
+                });
+              },
+            ),
+            Text(myPass),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Existing code
+
+  Future writeToSecureStorage() async {
+    await storage.write(key: myKey, value: pwdController.text);
+  }
+
+  Future<String> readFromSecureStorage() async {
+    String secret = await storage.read(key: myKey) ?? '';
+    return secret;
+  }
+}
+```
+
+### Run
+
+Jalankan aplikasi. Masukkan teks, simpan, lalu baca kembali. Teks tersebut seharusnya ditampilkan, menandakan data telah disimpan dan diambil dengan aman.
+
+![Langkah 9](images/prak7_langkah9.gif)
+
+**Soal 9**
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
+- Lalu lakukan commit dengan pesan "**W13: Jawaban Soal 9**". ꪜ
