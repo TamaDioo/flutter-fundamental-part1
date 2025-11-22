@@ -92,3 +92,83 @@ class _MyHomePageState extends State<MyHomePage> {
 
 - Masukkan hasil capture layar ke laporan praktikum Anda. ꪜ
 - Lakukan commit hasil jawaban Soal 2 dengan pesan "**W13: Jawaban Soal 2**" ꪜ
+
+### Kode Program file `lib/model/pizza.dart`:
+
+```dart
+class Pizza {
+  final int id;
+  final String pizzaName;
+  final String description;
+  final double price;
+  final String imageUrl;
+
+  Pizza.fromJson(Map<String, dynamic> json)
+    : id = json['id'],
+      pizzaName = json['pizzaName'],
+      description = json['description'],
+      price = json['price'],
+      imageUrl = json['imageUrl'];
+}
+```
+
+### Update Kode Program Class `_MyHomePageState` di `main.dart`:
+
+```dart
+class _MyHomePageState extends State<MyHomePage> {
+  String pizzaString = '';
+  List<Pizza> myPizzas = [];
+
+  @override
+  void initState() {
+    super.initState();
+    readJsonFile().then((value) {
+      setState(() {
+        myPizzas = value;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('JSON Dio')),
+      body: ListView.builder(
+        itemCount: myPizzas.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(myPizzas[index].pizzaName),
+            subtitle: Text(myPizzas[index].description),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<List<Pizza>> readJsonFile() async {
+    String myString = await DefaultAssetBundle.of(
+      context,
+    ).loadString('assets/pizzalist.json');
+    List pizzaMapList = jsonDecode(myString);
+    List<Pizza> myPizzas = [];
+    for (var pizza in pizzaMapList) {
+      Pizza myPizza = Pizza.fromJson(pizza);
+      myPizzas.add(myPizza);
+    }
+    return myPizzas;
+    // setState(() {
+    //   pizzaString = pizzaMapList.toString();
+    // });
+  }
+```
+
+### Run
+
+Jalankan aplikasi. Sekarang, Anda akan melihat data pizza ditampilkan dalam daftar yang lebih terstruktur sebagai objek List Dart.
+
+![Langkah 22](images/prak1_langkah22.jpg)
+
+**Soal 3**
+
+- Masukkan hasil capture layar ke laporan praktikum Anda. ꪜ
+- Lakukan commit hasil jawaban Soal 2 dengan pesan "**W13: Jawaban Soal 3**" ꪜ
