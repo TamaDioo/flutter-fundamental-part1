@@ -2,6 +2,7 @@ import 'dart:convert';
 import './model/pizza.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,11 +33,14 @@ class _MyHomePageState extends State<MyHomePage> {
   String pizzaString = '';
   List<Pizza> myPizzas = [];
   int appCounter = 0;
+  String documentsPath = '';
+  String tempPath = '';
 
   @override
   void initState() {
     super.initState();
-    readAndWritePreference();
+    getPaths();
+    // readAndWritePreference();
     // readJsonFile().then((value) {
     //   setState(() {
     //     myPizzas = value;
@@ -47,8 +51,16 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Shared Preferences Dio')),
-      body: Center(
+      appBar: AppBar(title: const Text('Path Provider Dio')),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text('Doc path: $documentsPath'),
+          Text('Temp path: $tempPath'),
+        ],
+      ),
+
+      /* body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -61,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
-      ),
+      ), */
 
       // body: ListView.builder(
       //   itemCount: myPizzas.length,
@@ -114,6 +126,15 @@ class _MyHomePageState extends State<MyHomePage> {
     await prefs.clear();
     setState(() {
       appCounter = 0;
+    });
+  }
+
+  Future getPaths() async {
+    final docDir = await getApplicationDocumentsDirectory();
+    final tempDir = await getTemporaryDirectory();
+    setState(() {
+      documentsPath = docDir.path;
+      tempPath = tempDir.path;
     });
   }
 }

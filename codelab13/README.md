@@ -440,3 +440,65 @@ Jalankan aplikasi. Tombol reset sekarang akan berfungsi, menghapus semua pasanga
 
 - Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
 - Lalu lakukan commit dengan pesan "**W13: Jawaban Soal 6**". ꪜ
+
+## Praktikum 5: Akses filesystem dengan path_provider
+
+### Update Kode Program `main.dart`:
+
+```dart
+import 'dart:convert';
+import './model/pizza.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart'
+
+// Existing code
+
+class _MyHomePageState extends State<MyHomePage> {
+  // Existing code
+  String documentsPath = '';
+  String tempPath = '';
+
+  @override
+  void initState() {
+    super.initState();
+    getPaths();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Path Provider Dio')),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text('Doc path: $documentsPath'),
+          Text('Temp path: $tempPath'),
+        ],
+      ),
+    );
+  }
+
+  // Existing code
+
+  Future getPaths() async {
+    final docDir = await getApplicationDocumentsDirectory();
+    final tempDir = await getTemporaryDirectory();
+    setState(() {
+      documentsPath = docDir.path;
+      tempPath = tempDir.path;
+    });
+  }
+}
+```
+
+### Run
+
+Jalankan aplikasi. Anda akan melihat path absolut ke direktori dokumen dan cache aplikasi di perangkat Anda.
+
+![Langkah 7](images/prak5_langkah7.png)
+
+**Soal 7**
+
+- Capture hasil praktikum Anda dan lampirkan di README. ꪜ
+- Lalu lakukan commit dengan pesan "**W13: Jawaban Soal 7**". ꪜ
