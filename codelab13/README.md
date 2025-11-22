@@ -160,6 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //   pizzaString = pizzaMapList.toString();
     // });
   }
+}
 ```
 
 ### Run
@@ -172,3 +173,99 @@ Jalankan aplikasi. Sekarang, Anda akan melihat data pizza ditampilkan dalam daft
 
 - Masukkan hasil capture layar ke laporan praktikum Anda. ꪜ
 - Lakukan commit hasil jawaban Soal 2 dengan pesan "**W13: Jawaban Soal 3**" ꪜ
+
+### Update Kode Program file `lib/model/pizza.dart`:
+
+```dart
+class Pizza {
+  // Existing code
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'pizzaName': pizzaName,
+      'description': description,
+      'price': price,
+      'imageUrl': imageUrl,
+    };
+  }
+}
+```
+
+### Update Kode Program Class `_MyHomePageState` di `main.dart`:
+
+```dart
+class _MyHomePageState extends State<MyHomePage> {
+  // Existing code
+
+  Future<List<Pizza>> readJsonFile() async {
+    // Existing code
+    String json = convertToJSON(myPizzas);
+    print(json);
+    return myPizzas;
+  }
+
+  String convertToJSON(List<Pizza> pizzas) {
+    return jsonEncode(pizzas.map((pizza) => jsonEncode(pizza)).toList());
+  }
+}
+```
+
+### Cek Output Konsol
+
+Jalankan aplikasi. Periksa Debug Console untuk melihat List objek Pizza telah berhasil dikonversi kembali menjadi JSON String.
+
+![Langkah 26](images/prak1_langkah26.png)
+
+## Praktikum 2: Handle kompatibilitas data JSON
+
+### Update Kode Program `Class Pizza`:
+
+```dart
+class Pizza {
+    // Existing code
+
+  Pizza.fromJson(Map<String, dynamic> json)
+    : id = int.tryParse(json['id'].toString()) ?? 0,
+      pizzaName = json['pizzaName'].toString(),
+      description = json['description'].toString(),
+      price = double.tryParse(json['price'].toString()) ?? 0,
+      imageUrl = json['imageUrl'].toString();
+
+  // Existing code
+}
+```
+
+### Run dan Perhatikan Output Null
+
+Setelah mengimplementasikan semua perbaikan tipe data, aplikasi akan berjalan, tetapi mungkin menampilkan "null" di UI jika ada bidang yang hilang atau gagal diparsing (seperti pizzaName atau description).
+
+![Langkah 9](images/prak2_langkah9.jpg)
+
+### Menambahkan Operator Ternary untuk Output User-Friendly
+
+```dart
+  Pizza.fromJson(Map<String, dynamic> json)
+    : id = int.tryParse(json['id'].toString()) ?? 0,
+      pizzaName = json['pizzaName'] != null
+          ? json['pizzaName'].toString()
+          : 'No name',
+      description = json['description'] != null
+          ? json['description'].toString()
+          : '',
+      price = double.tryParse(json['price'].toString()) ?? 0,
+      imageUrl = json['imageUrl'] ?? '';
+```
+
+### Run
+
+Jalankan aplikasi. Sekarang data yang tidak konsisten telah ditangani dengan baik, dan UI tidak menampilkan nilai null.
+
+![Langkah 11](images/prak2_langkah11.jpg)
+
+![Langkah 11](images/prak2_langkah11.png)
+
+**Soal 4**
+
+- Capture hasil running aplikasi Anda, kemudian impor ke laporan praktikum Anda! ꪜ
+- Lalu lakukan commit dengan pesan "**W13: Jawaban Soal 4**". ꪜ
