@@ -502,3 +502,97 @@ Jalankan aplikasi. Anda akan melihat path absolut ke direktori dokumen dan cache
 
 - Capture hasil praktikum Anda dan lampirkan di README. ꪜ
 - Lalu lakukan commit dengan pesan "**W13: Jawaban Soal 7**". ꪜ
+
+## Praktikum 6: Akses filesystem dengan direktori
+
+### Update Kode Program `main.dart`:
+
+```dart
+import 'dart:convert';
+import './model/pizza.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+
+// Existing code
+
+class _MyHomePageState extends State<MyHomePage> {
+  // Existing code
+  String documentsPath = '';
+  String tempPath = '';
+  late File myFile;
+  String fileText = '';
+
+  @override
+  void initState() {
+    getPaths().then((_) {
+      myFile = File('$documentsPath/pizzas.txt');
+      writeFile();
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Path Provider Dio')),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text('Doc path: $documentsPath'),
+          Text('Temp path: $tempPath'),
+
+          ElevatedButton(
+            child: const Text('Read File'),
+            onPressed: () => readFile(),
+          ),
+          Text(fileText),
+        ],
+      ),
+    );
+  }
+
+  // Existing code
+
+  Future<bool> writeFile() async {
+    try {
+      await myFile.writeAsString('Dio Andika Pradana Mulia Tama, 2341720098');
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> readFile() async {
+    try {
+      String fileContent = await myFile.readAsString();
+      setState(() {
+        fileText = fileContent;
+      });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+}
+```
+
+### Run
+
+Jalankan aplikasi. Setelah menekan tombol 'Read File', konten yang ditulis (Margherita, Capricciosa, Napoli) akan ditampilkan atau sesuai nama dan NIM Anda.
+
+![Langkah 7](images/prak6_langkah7.gif)
+
+**Soal 8**
+
+- Jelaskan maksud kode pada langkah 3 dan 7 !
+
+  Maksud dari kode pada langkah 3 (`writeFile`) adalah untuk menuliskan data teks (String) ke dalam sebuah file di penyimpanan lokal perangkat secara asinkron.
+
+  1. `Future<bool> writeFile() async` mendefinisikan method bernama `writeFile` yang bersifat asynchronous (`async`). Method ini mengembalikan `Future<bool>`, yang berarti akan menghasilkan nilai `true` (berhasil) atau `false` (gagal) di masa depan, tanpa memblokir UI saat proses penulisan berlangsung.
+  2. `try { ... } catch (e) { ... }` adalah error handling. Program akan mencoba menjalankan kode di dalam `try`. Jika terjadi kesalahan saat menulis file (misalnya memori penuh atau izin akses ditolak), program tidak akan crash, melainkan melompat ke blok `catch` dan mengembalikan `false`.
+  3. `await myFile.writeAsString(...)` artinya objek `myFile` memanggil metode `.writeAsString().` Perintah ini menuliskan teks `'Dio Andika Pradana Mulia Tama, 2341720098'` ke dalam file tersebut. Konten file yang lama akan tertimpa oleh teks baru ini. Keyword `await` digunakan untuk menunggu proses penulisan selesai sebelum lanjut ke baris berikutnya (`return true`).
+
+- Capture hasil praktikum Anda berupa GIF dan lampirkan di README. ꪜ
+- Lalu lakukan commit dengan pesan "**W13: Jawaban Soal 8**". ꪜ
