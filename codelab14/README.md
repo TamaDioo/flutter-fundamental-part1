@@ -330,11 +330,7 @@ class _PizzaDetailScreenState extends State<PizzaDetailScreen> {
     const putPath = '/pizza';
     String put = json.encode(pizza.toJson());
     Uri url = Uri.https(authority, putPath);
-    http.Response r = await http.put(
-      url,
-      body: put,
-      headers: {'Content-Type': 'application/json'},
-    );
+    http.Response r = await http.put(url, body: put);
     return r.body;
   }
 ```
@@ -590,3 +586,118 @@ class _MyHomePageState extends State<MyHomePage> {
 - Capture hasil aplikasi Anda berupa GIF di README dan lakukan commit hasil jawaban Soal 3 dengan pesan "**W14: Jawaban Soal 3**" ꪜ
 
   ![Soal 3](images/soal3.gif)
+
+## Praktikum 4: Menghapus Data dari Web Service (DELETE)
+
+### Konfigurasi Stub DELETE
+
+![Praktikum 4](images/prak4_delete.gif)
+
+### Menambahkan method `deletePizza()` di Class `HttpHelper`:
+
+```dart
+  Future<String> deletePizza(int id) async {
+    const deletePath = '/pizza';
+    Uri url = Uri.https(authority, deletePath);
+    http.Response r = await http.delete(url);
+    return r.body;
+  }
+```
+
+### Update Kode Program `main.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'httphelper.dart';
+import 'pizza.dart';
+import 'pizza_detail.dart';
+
+// Existing code
+
+class _MyHomePageState extends State<MyHomePage> {
+  Future<List<Pizza>> callPizzas() async {
+    HttpHelper helper = HttpHelper();
+    List<Pizza> pizzas = await helper.getPizzaList();
+    return pizzas;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('JSON Dio')),
+      body: FutureBuilder(
+        future: callPizzas(),
+        builder: (BuildContext context, AsyncSnapshot<List<Pizza>> snapshot) {
+          if (snapshot.hasError) {
+            return const Text('Something went wrong');
+          }
+          if (!snapshot.hasData) {
+            return const CircularProgressIndicator();
+          }
+          return ListView.builder(
+            itemCount: (snapshot.data == null) ? 0 : snapshot.data!.length,
+            itemBuilder: (BuildContext context, int position) {
+              return Dismissible(
+                key: Key(position.toString()),
+                onDismissed: (item) {
+                  HttpHelper helper = HttpHelper();
+                  snapshot.data!.removeWhere(
+                    (element) => element.id == snapshot.data![position].id,
+                  );
+                  helper.deletePizza(snapshot.data![position].id!);
+                },
+                child: ListTile(
+                  title: Text(snapshot.data![position].pizzaName ?? ''),
+                  subtitle: Text(
+                    '${snapshot.data![position].description ?? ''} - € ${snapshot.data![position].price ?? 0}',
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.star, color: Colors.amber, size: 16),
+                      Text(' ${snapshot.data![position].rating ?? 0}'),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PizzaDetailScreen(
+                          pizza: snapshot.data![position],
+                          isNew: false,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  PizzaDetailScreen(pizza: Pizza(), isNew: true),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+```
+
+### Run
+
+![Praktikum 4](images/prak4_output.gif)
+
+**Soal 4**
+
+- Capture hasil aplikasi Anda berupa GIF di README dan lakukan commit hasil jawaban Soal 4 dengan pesan "**W14: Jawaban Soal 4**" ꪜ
+
+  ![Praktikum 4](images/soal4.gif)
