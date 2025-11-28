@@ -3,7 +3,14 @@ import 'httphelper.dart';
 import 'pizza.dart';
 
 class PizzaDetailScreen extends StatefulWidget {
-  const PizzaDetailScreen({super.key});
+  final Pizza pizza;
+  final bool isNew;
+
+  const PizzaDetailScreen({
+    super.key,
+    required this.pizza,
+    required this.isNew,
+  });
   @override
   State<PizzaDetailScreen> createState() => _PizzaDetailScreenState();
 }
@@ -16,6 +23,19 @@ class _PizzaDetailScreenState extends State<PizzaDetailScreen> {
   final TextEditingController txtImageUrl = TextEditingController();
   final TextEditingController txtRating = TextEditingController();
   String operationResult = '';
+
+  @override
+  void initState() {
+    if (!widget.isNew) {
+      txtId.text = widget.pizza.id?.toString() ?? '';
+      txtName.text = widget.pizza.pizzaName ?? '';
+      txtDescription.text = widget.pizza.description ?? '';
+      txtPrice.text = widget.pizza.price?.toString() ?? '';
+      txtImageUrl.text = widget.pizza.imageUrl ?? '';
+      txtRating.text = widget.pizza.rating?.toString() ?? '';
+    }
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -83,9 +103,10 @@ class _PizzaDetailScreenState extends State<PizzaDetailScreen> {
               ),
               const SizedBox(height: 48),
               ElevatedButton(
-                child: const Text('Send Post'),
+                child: const Text('Save'),
                 onPressed: () {
-                  postPizza();
+                  // postPizza();
+                  savePizza();
                 },
               ),
             ],
@@ -105,6 +126,24 @@ class _PizzaDetailScreenState extends State<PizzaDetailScreen> {
     pizza.imageUrl = txtImageUrl.text;
     pizza.rating = double.tryParse(txtRating.text);
     String result = await helper.postPizza(pizza);
+    setState(() {
+      operationResult = result;
+    });
+  }
+
+  Future savePizza() async {
+    HttpHelper helper = HttpHelper();
+    Pizza pizza = Pizza();
+    pizza.id = int.tryParse(txtId.text);
+    pizza.pizzaName = txtName.text;
+    pizza.description = txtDescription.text;
+    pizza.price = double.tryParse(txtPrice.text);
+    pizza.imageUrl = txtImageUrl.text;
+    pizza.rating = double.tryParse(txtRating.text);
+
+    final result = await (widget.isNew
+        ? helper.postPizza(pizza)
+        : helper.putPizza(pizza));
     setState(() {
       operationResult = result;
     });
